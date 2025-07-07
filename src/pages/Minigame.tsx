@@ -23,6 +23,8 @@ interface Coin {
   x: number;
   y: number;
   collected: boolean;
+  width: number;
+  height: number;
 }
 
 interface Enemy {
@@ -36,18 +38,19 @@ interface Enemy {
 const Minigame = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const gameAreaRef = useRef<HTMLDivElement>(null);
+  const gameLoopRef = useRef<number>();
   
   const [gameState, setGameState] = useState<'menu' | 'playing' | 'gameOver'>('menu');
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
+  
   const [player, setPlayer] = useState<Player>({
     x: 50,
     y: 300,
     velocityY: 0,
     onGround: false,
-    width: 40,
-    height: 40
+    width: 32,
+    height: 32
   });
 
   const platforms: Platform[] = [
@@ -60,179 +63,203 @@ const Minigame = () => {
     { x: 1150, y: 300, width: 100, height: 20 },
   ];
 
-  const [coins, setCoins] = useState<Coin[]>([
-    { x: 120, y: 360, collected: false },
-    { x: 320, y: 310, collected: false },
-    { x: 500, y: 260, collected: false },
-    { x: 650, y: 210, collected: false },
-    { x: 850, y: 160, collected: false },
-    { x: 1000, y: 310, collected: false },
-  ]);
+  const initialCoins: Coin[] = [
+    { x: 120, y: 360, collected: false, width: 20, height: 20 },
+    { x: 320, y: 310, collected: false, width: 20, height: 20 },
+    { x: 500, y: 260, collected: false, width: 20, height: 20 },
+    { x: 650, y: 210, collected: false, width: 20, height: 20 },
+    { x: 850, y: 160, collected: false, width: 20, height: 20 },
+    { x: 1000, y: 310, collected: false, width: 20, height: 20 },
+  ];
 
-  const [enemies, setEnemies] = useState<Enemy[]>([
-    { x: 300, y: 320, velocityX: -1, width: 30, height: 30 },
-    { x: 700, y: 220, velocityX: 1, width: 30, height: 30 },
-    { x: 1100, y: 270, velocityX: -1, width: 30, height: 30 },
-  ]);
+  const initialEnemies: Enemy[] = [
+    { x: 300, y: 320, velocityX: -1, width: 24, height: 24 },
+    { x: 700, y: 220, velocityX: 1, width: 24, height: 24 },
+    { x: 1100, y: 270, velocityX: -1, width: 24, height: 24 },
+  ];
 
+  const [coins, setCoins] = useState<Coin[]>(initialCoins);
+  const [enemies, setEnemies] = useState<Enemy[]>(initialEnemies);
   const [keys, setKeys] = useState<{[key: string]: boolean}>({});
   const [cameraX, setCameraX] = useState(0);
 
   // Handle keyboard input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
       setKeys(prev => ({ ...prev, [e.code]: true }));
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      e.preventDefault();
       setKeys(prev => ({ ...prev, [e.code]: false }));
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    if (gameState === 'playing') {
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+    }
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [gameState]);
 
   // Collision detection
-  const checkCollision = (rect1: any, rect2: any) => {
+  const checkCollision = useCallback((rect1: any, rect2: any) => {
     return rect1.x < rect2.x + rect2.width &&
            rect1.x + rect1.width > rect2.x &&
            rect1.y < rect2.y + rect2.height &&
            rect1.y + rect1.height > rect2.y;
-  };
+  }, []);
 
   // Game loop
   useEffect(() => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing') {
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current);
+      }
+      return;
+    }
 
-    const gameLoop = setInterval(() => {
-      setPlayer(prevPlayer => {
-        let newPlayer = { ...prevPlayer };
-        
-        // Apply gravity
-        newPlayer.velocityY += 0.8;
-        newPlayer.y += newPlayer.velocityY;
-        newPlayer.onGround = false;
+    let lastTime = 0;
+    const FIXED_TIMESTEP = 1000 / 60; // 60 FPS
 
-        // Handle movement
-        if (keys['ArrowLeft'] || keys['KeyA']) {
-          newPlayer.x -= 5;
-        }
-        if (keys['ArrowRight'] || keys['KeyD']) {
-          newPlayer.x += 5;
-        }
-        if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && prevPlayer.onGround) {
-          newPlayer.velocityY = -15;
-        }
+    const gameLoop = (currentTime: number) => {
+      if (currentTime - lastTime >= FIXED_TIMESTEP) {
+        // Update player
+        setPlayer(prevPlayer => {
+          let newPlayer = { ...prevPlayer };
+          
+          // Apply gravity
+          newPlayer.velocityY += 0.5;
+          newPlayer.y += newPlayer.velocityY;
+          newPlayer.onGround = false;
 
-        // Platform collision
-        platforms.forEach(platform => {
-          if (checkCollision(newPlayer, platform)) {
-            if (prevPlayer.y + prevPlayer.height <= platform.y && newPlayer.velocityY > 0) {
-              newPlayer.y = platform.y - newPlayer.height;
-              newPlayer.velocityY = 0;
-              newPlayer.onGround = true;
-            }
+          // Handle movement
+          const moveSpeed = 3;
+          if (keys['ArrowLeft'] || keys['KeyA']) {
+            newPlayer.x -= moveSpeed;
           }
-        });
+          if (keys['ArrowRight'] || keys['KeyD']) {
+            newPlayer.x += moveSpeed;
+          }
+          if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && prevPlayer.onGround) {
+            newPlayer.velocityY = -12;
+          }
 
-        // Ground collision
-        if (newPlayer.y > 420) {
-          newPlayer.y = 420 - newPlayer.height;
-          newPlayer.velocityY = 0;
-          newPlayer.onGround = true;
-        }
+          // Platform collision
+          platforms.forEach(platform => {
+            if (checkCollision(newPlayer, platform)) {
+              // Landing on top of platform
+              if (prevPlayer.y + prevPlayer.height <= platform.y + 5 && newPlayer.velocityY >= 0) {
+                newPlayer.y = platform.y - newPlayer.height;
+                newPlayer.velocityY = 0;
+                newPlayer.onGround = true;
+              }
+            }
+          });
 
-        // Boundary check
-        if (newPlayer.x < 0) newPlayer.x = 0;
-        if (newPlayer.x > 1200) newPlayer.x = 1200;
+          // Ground collision
+          if (newPlayer.y >= 420 - newPlayer.height) {
+            newPlayer.y = 420 - newPlayer.height;
+            newPlayer.velocityY = 0;
+            newPlayer.onGround = true;
+          }
 
-        // Death by falling
-        if (newPlayer.y > 500) {
-          setLives(prev => prev - 1);
-          if (lives <= 1) {
-            setGameState('gameOver');
-          } else {
+          // Boundary check
+          if (newPlayer.x < 0) newPlayer.x = 0;
+          if (newPlayer.x > 1200 - newPlayer.width) newPlayer.x = 1200 - newPlayer.width;
+
+          // Death by falling
+          if (newPlayer.y > 500) {
+            setLives(prev => {
+              const newLives = prev - 1;
+              if (newLives <= 0) {
+                setGameState('gameOver');
+              }
+              return newLives;
+            });
             // Reset player position
             newPlayer.x = 50;
             newPlayer.y = 300;
             newPlayer.velocityY = 0;
           }
-        }
 
-        return newPlayer;
-      });
+          return newPlayer;
+        });
 
-      // Update camera to follow player
-      setCameraX(prevCamera => {
-        const targetCamera = Math.max(0, Math.min(player.x - 400, 600));
-        return prevCamera + (targetCamera - prevCamera) * 0.1;
-      });
+        // Update camera
+        setCameraX(prevCamera => {
+          const targetCamera = Math.max(0, Math.min(player.x - 300, 600));
+          return prevCamera + (targetCamera - prevCamera) * 0.05;
+        });
 
-      // Update enemies
-      setEnemies(prevEnemies => 
-        prevEnemies.map(enemy => {
-          let newEnemy = { ...enemy };
-          newEnemy.x += newEnemy.velocityX;
-          
-          // Bounce off platforms
-          let onPlatform = false;
-          platforms.forEach(platform => {
-            if (newEnemy.x >= platform.x - 20 && newEnemy.x <= platform.x + platform.width + 20) {
-              if (Math.abs(newEnemy.y + newEnemy.height - platform.y) < 5) {
-                onPlatform = true;
-              }
+        // Update enemies
+        setEnemies(prevEnemies => 
+          prevEnemies.map(enemy => {
+            let newEnemy = { ...enemy };
+            newEnemy.x += newEnemy.velocityX;
+            
+            // Simple boundary bouncing
+            if (newEnemy.x <= 0 || newEnemy.x >= 1200 - newEnemy.width) {
+              newEnemy.velocityX *= -1;
             }
-          });
-          
-          if (!onPlatform || newEnemy.x < 0 || newEnemy.x > 1200) {
-            newEnemy.velocityX *= -1;
-          }
 
-          return newEnemy;
-        })
-      );
+            return newEnemy;
+          })
+        );
 
-      // Check coin collection
-      setCoins(prevCoins => 
-        prevCoins.map(coin => {
-          if (!coin.collected && checkCollision(player, { ...coin, width: 20, height: 20 })) {
-            setScore(prev => prev + 100);
-            return { ...coin, collected: true };
-          }
-          return coin;
-        })
-      );
+        // Check coin collection
+        setCoins(prevCoins => 
+          prevCoins.map(coin => {
+            if (!coin.collected && checkCollision(player, coin)) {
+              setScore(prev => prev + 100);
+              return { ...coin, collected: true };
+            }
+            return coin;
+          })
+        );
 
-      // Check enemy collision
-      enemies.forEach(enemy => {
-        if (checkCollision(player, enemy)) {
-          setLives(prev => prev - 1);
-          if (lives <= 1) {
-            setGameState('gameOver');
-          } else {
+        // Check enemy collision
+        enemies.forEach(enemy => {
+          if (checkCollision(player, enemy)) {
+            setLives(prev => {
+              const newLives = prev - 1;
+              if (newLives <= 0) {
+                setGameState('gameOver');
+              }
+              return newLives;
+            });
             // Reset player position
             setPlayer(prev => ({ ...prev, x: 50, y: 300, velocityY: 0 }));
           }
-        }
-      });
+        });
 
-    }, 1000 / 60); // 60 FPS
+        lastTime = currentTime;
+      }
 
-    return () => clearInterval(gameLoop);
-  }, [gameState, keys, player, lives, enemies]);
+      gameLoopRef.current = requestAnimationFrame(gameLoop);
+    };
+
+    gameLoopRef.current = requestAnimationFrame(gameLoop);
+
+    return () => {
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current);
+      }
+    };
+  }, [gameState, keys, player, enemies, checkCollision]);
 
   const startGame = () => {
     setGameState('playing');
     setScore(0);
     setLives(3);
-    setPlayer({ x: 50, y: 300, velocityY: 0, onGround: false, width: 40, height: 40 });
+    setPlayer({ x: 50, y: 300, velocityY: 0, onGround: false, width: 32, height: 32 });
     setCameraX(0);
-    setCoins(prev => prev.map(coin => ({ ...coin, collected: false })));
+    setCoins(initialCoins);
+    setEnemies(initialEnemies);
   };
 
   const resetGame = () => {
@@ -309,14 +336,13 @@ const Minigame = () => {
 
       {/* Game Area */}
       <div 
-        ref={gameAreaRef}
         className="relative w-full h-screen overflow-hidden"
         style={{ transform: `translateX(${-cameraX}px)` }}
       >
         {/* Platforms */}
         {platforms.map((platform, i) => (
           <div
-            key={i}
+            key={`platform-${i}`}
             className="absolute bg-green-600 border-2 border-green-800"
             style={{
               left: platform.x,
@@ -331,8 +357,8 @@ const Minigame = () => {
         {coins.map((coin, i) => (
           !coin.collected && (
             <div
-              key={i}
-              className="absolute text-2xl animate-bounce"
+              key={`coin-${i}`}
+              className="absolute text-xl"
               style={{
                 left: coin.x,
                 top: coin.y,
@@ -346,8 +372,8 @@ const Minigame = () => {
         {/* Enemies */}
         {enemies.map((enemy, i) => (
           <div
-            key={i}
-            className="absolute text-2xl"
+            key={`enemy-${i}`}
+            className="absolute text-xl"
             style={{
               left: enemy.x,
               top: enemy.y,
@@ -359,7 +385,7 @@ const Minigame = () => {
 
         {/* Player */}
         <div
-          className="absolute text-3xl transition-all duration-100"
+          className="absolute text-2xl"
           style={{
             left: player.x,
             top: player.y,
