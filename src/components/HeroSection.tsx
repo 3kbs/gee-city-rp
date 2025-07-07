@@ -78,6 +78,15 @@ const HeroSection = () => {
             <Button 
               variant="outline" 
               size="lg"
+              onClick={() => navigate('/shop')}
+              className="font-rajdhani font-semibold text-lg px-8 py-4 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white transition-all duration-300 transform hover:scale-105"
+            >
+              🛒 SHOP
+            </Button>
+
+            <Button 
+              variant="outline" 
+              size="lg"
               onClick={handleMinigameClick}
               className="font-rajdhani font-semibold text-lg px-8 py-4 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-white transition-all duration-300 transform hover:scale-105"
             >
