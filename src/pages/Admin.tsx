@@ -5,9 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/auth';
 import { useNavigate } from 'react-router-dom';
+import TeamManagement from '@/components/TeamManagement';
+import CarManagement from '@/components/CarManagement';
+import ItemManagement from '@/components/ItemManagement';
 
 interface Task {
   id: number;
@@ -297,180 +301,227 @@ const Admin = () => {
             </Card>
           </div>
 
-          {/* Main Content Area */}
-          <div className="lg:col-span-9 space-y-6 md:space-y-8">
-        {/* Create New Task */}
-        <Card className="gaming-card border border-neon-red/30 mb-8">
-          <CardHeader>
-            <h2 className="font-orbitron text-xl font-bold text-white neon-glow">
-              📝 Create New Task
-            </h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              placeholder="Task title..."
-              value={newTask.title}
-              onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-            />
-            
-            <Textarea
-              placeholder="Task description..."
-              value={newTask.description}
-              onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400 min-h-[100px]"
-            />
-            
-            <div className="flex gap-4">
-              <Select value={newTask.priority.toString()} onValueChange={(value) => setNewTask({ ...newTask, priority: parseInt(value) })}>
-                <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gaming-gray border-gaming-gray">
-                  {Object.entries(priorityConfig).map(([priority, config]) => (
-                    <SelectItem key={priority} value={priority} className="text-white hover:bg-gaming-dark">
-                      <span className={`inline-block w-3 h-3 rounded-full ${config.color} mr-2`}></span>
-                      Priority {priority} - {config.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          {/* Main Content Area with Tabs */}
+          <div className="lg:col-span-9">
+            <Tabs defaultValue="tasks" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4 bg-gaming-gray border border-gaming-gray">
+                <TabsTrigger 
+                  value="tasks" 
+                  className="data-[state=active]:bg-neon-red data-[state=active]:text-white text-gray-300 font-rajdhani"
+                >
+                  📝 Tasks
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="team" 
+                  className="data-[state=active]:bg-neon-red data-[state=active]:text-white text-gray-300 font-rajdhani"
+                >
+                  👥 Team
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="cars" 
+                  className="data-[state=active]:bg-neon-red data-[state=active]:text-white text-gray-300 font-rajdhani"
+                >
+                  🚗 Cars
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="items" 
+                  className="data-[state=active]:bg-neon-red data-[state=active]:text-white text-gray-300 font-rajdhani"
+                >
+                  📦 Items
+                </TabsTrigger>
+              </TabsList>
 
-              <Select value={newTask.status} onValueChange={(value) => setNewTask({ ...newTask, status: value as 'open' | 'in-progress' | 'completed' })}>
-                <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gaming-gray border-gaming-gray">
-                  {Object.entries(statusConfig).map(([status, config]) => (
-                    <SelectItem key={status} value={status} className="text-white hover:bg-gaming-dark">
-                      {config.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Task Management Tab */}
+              <TabsContent value="tasks" className="space-y-6">
+                {/* Create New Task */}
+                <Card className="gaming-card border border-neon-red/30">
+                  <CardHeader>
+                    <h2 className="font-orbitron text-xl font-bold text-white neon-glow">
+                      📝 Create New Task
+                    </h2>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Input
+                      placeholder="Task title..."
+                      value={newTask.title}
+                      onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                      className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+                    />
+                    
+                    <Textarea
+                      placeholder="Task description..."
+                      value={newTask.description}
+                      onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                      className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400 min-h-[100px]"
+                    />
+                    
+                    <div className="flex gap-4">
+                      <Select value={newTask.priority.toString()} onValueChange={(value) => setNewTask({ ...newTask, priority: parseInt(value) })}>
+                        <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gaming-gray border-gaming-gray">
+                          {Object.entries(priorityConfig).map(([priority, config]) => (
+                            <SelectItem key={priority} value={priority} className="text-white hover:bg-gaming-dark">
+                              <span className={`inline-block w-3 h-3 rounded-full ${config.color} mr-2`}></span>
+                              Priority {priority} - {config.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-              <Button 
-                onClick={handleCreateTask}
-                className="bg-neon-red hover:bg-red-600 text-white border-0 font-rajdhani font-semibold"
-              >
-                Create Task
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                      <Select value={newTask.status} onValueChange={(value) => setNewTask({ ...newTask, status: value as 'open' | 'in-progress' | 'completed' })}>
+                        <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gaming-gray border-gaming-gray">
+                          {Object.entries(statusConfig).map(([status, config]) => (
+                            <SelectItem key={status} value={status} className="text-white hover:bg-gaming-dark">
+                              {config.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
 
-        {/* Sort Controls */}
-        <div className="flex items-center gap-4 mb-6">
-          <span className="text-gray-300 font-rajdhani">Sort by:</span>
-          <Select value={sortBy} onValueChange={(value: 'priority' | 'date' | 'status') => setSortBy(value)}>
-            <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-gaming-gray border-gaming-gray">
-              <SelectItem value="priority" className="text-white hover:bg-gaming-dark">Priority</SelectItem>
-              <SelectItem value="date" className="text-white hover:bg-gaming-dark">Date</SelectItem>
-              <SelectItem value="status" className="text-white hover:bg-gaming-dark">Status</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Task Forum */}
-        <div className="space-y-6">
-          {sortedTasks.map((task) => (
-            <Card key={task.id} className="gaming-card border border-gaming-gray hover:border-neon-red/50 transition-all duration-300">
-              <CardContent className="p-6">
-                {/* Task Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Badge className={`${priorityConfig[task.priority as keyof typeof priorityConfig].color} text-white font-bold`}>
-                        P{task.priority}
-                      </Badge>
-                      <Badge variant="outline" className={statusConfig[task.status].color}>
-                        {statusConfig[task.status].label}
-                      </Badge>
+                      <Button 
+                        onClick={handleCreateTask}
+                        className="bg-neon-red hover:bg-red-600 text-white border-0 font-rajdhani font-semibold"
+                      >
+                        Create Task
+                      </Button>
                     </div>
-                    
-                    <h3 className="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-neon-red transition-colors">
-                      {task.title}
-                    </h3>
-                    
-                    <p className="text-gray-300 font-rajdhani mb-3">
-                      {task.description}
-                    </p>
-                    
-                    <div className="flex items-center gap-4 text-sm text-gray-400">
-                      <span>By <span className="text-neon-red">{task.author}</span></span>
-                      <span>•</span>
-                      <span>{task.createdAt.toLocaleDateString()}</span>
-                      <span>•</span>
-                      <span>{task.replies.length} replies</span>
-                    </div>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  <Select value={task.status} onValueChange={(value) => handleStatusChange(task.id, value as 'open' | 'in-progress' | 'completed')}>
-                    <SelectTrigger className="w-40 bg-gaming-gray border-gaming-gray text-white">
+                {/* Sort Controls */}
+                <div className="flex items-center gap-4">
+                  <span className="text-gray-300 font-rajdhani">Sort by:</span>
+                  <Select value={sortBy} onValueChange={(value: 'priority' | 'date' | 'status') => setSortBy(value)}>
+                    <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-gaming-gray border-gaming-gray">
-                      {Object.entries(statusConfig).map(([status, config]) => (
-                        <SelectItem key={status} value={status} className="text-white hover:bg-gaming-dark">
-                          {config.label}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="priority" className="text-white hover:bg-gaming-dark">Priority</SelectItem>
+                      <SelectItem value="date" className="text-white hover:bg-gaming-dark">Date</SelectItem>
+                      <SelectItem value="status" className="text-white hover:bg-gaming-dark">Status</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                {/* Replies */}
-                {task.replies.length > 0 && (
-                  <div className="border-t border-gaming-gray pt-4 mt-4">
-                    <h4 className="text-gray-300 font-rajdhani font-semibold mb-3">Replies:</h4>
-                    <div className="space-y-3">
-                      {task.replies.map((reply) => (
-                        <div key={reply.id} className="bg-gaming-dark/50 rounded-lg p-3 border border-gaming-gray/50">
-                          <p className="text-gray-300 mb-2">{reply.content}</p>
-                          <div className="flex items-center gap-2 text-xs text-gray-400">
-                            <span className="text-neon-red">{reply.author}</span>
-                            <span>•</span>
-                            <span>{reply.createdAt.toLocaleDateString()}</span>
+                {/* Task Forum */}
+                <div className="space-y-6">
+                  {sortedTasks.map((task) => (
+                    <Card key={task.id} className="gaming-card border border-gaming-gray hover:border-neon-red/50 transition-all duration-300">
+                      <CardContent className="p-6">
+                        {/* Task Header */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Badge className={`${priorityConfig[task.priority as keyof typeof priorityConfig].color} text-white font-bold`}>
+                                P{task.priority}
+                              </Badge>
+                              <Badge variant="outline" className={statusConfig[task.status].color}>
+                                {statusConfig[task.status].label}
+                              </Badge>
+                            </div>
+                            
+                            <h3 className="font-orbitron text-xl font-bold text-white mb-2 group-hover:text-neon-red transition-colors">
+                              {task.title}
+                            </h3>
+                            
+                            <p className="text-gray-300 font-rajdhani mb-3">
+                              {task.description}
+                            </p>
+                            
+                            <div className="flex items-center gap-4 text-sm text-gray-400">
+                              <span>By <span className="text-neon-red">{task.author}</span></span>
+                              <span>•</span>
+                              <span>{task.createdAt.toLocaleDateString()}</span>
+                              <span>•</span>
+                              <span>{task.replies.length} replies</span>
+                            </div>
+                          </div>
+
+                          <Select value={task.status} onValueChange={(value) => handleStatusChange(task.id, value as 'open' | 'in-progress' | 'completed')}>
+                            <SelectTrigger className="w-40 bg-gaming-gray border-gaming-gray text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gaming-gray border-gaming-gray">
+                              {Object.entries(statusConfig).map(([status, config]) => (
+                                <SelectItem key={status} value={status} className="text-white hover:bg-gaming-dark">
+                                  {config.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Replies */}
+                        {task.replies.length > 0 && (
+                          <div className="border-t border-gaming-gray pt-4 mt-4">
+                            <h4 className="text-gray-300 font-rajdhani font-semibold mb-3">Replies:</h4>
+                            <div className="space-y-3">
+                              {task.replies.map((reply) => (
+                                <div key={reply.id} className="bg-gaming-dark/50 rounded-lg p-3 border border-gaming-gray/50">
+                                  <p className="text-gray-300 mb-2">{reply.content}</p>
+                                  <div className="flex items-center gap-2 text-xs text-gray-400">
+                                    <span className="text-neon-red">{reply.author}</span>
+                                    <span>•</span>
+                                    <span>{reply.createdAt.toLocaleDateString()}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add Reply */}
+                        <div className="border-t border-gaming-gray pt-4 mt-4">
+                          <div className="flex gap-3">
+                            <Input
+                              placeholder="Add a reply..."
+                              value={newReply[task.id] || ''}
+                              onChange={(e) => setNewReply({ ...newReply, [task.id]: e.target.value })}
+                              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+                              onKeyPress={(e) => e.key === 'Enter' && handleAddReply(task.id)}
+                            />
+                            <Button 
+                              onClick={() => handleAddReply(task.id)}
+                              className="bg-neon-red hover:bg-red-600 text-white border-0 font-rajdhani"
+                            >
+                              Reply
+                            </Button>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Add Reply */}
-                <div className="border-t border-gaming-gray pt-4 mt-4">
-                  <div className="flex gap-3">
-                    <Input
-                      placeholder="Add a reply..."
-                      value={newReply[task.id] || ''}
-                      onChange={(e) => setNewReply({ ...newReply, [task.id]: e.target.value })}
-                      className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-                      onKeyPress={(e) => e.key === 'Enter' && handleAddReply(task.id)}
-                    />
-                    <Button 
-                      onClick={() => handleAddReply(task.id)}
-                      className="bg-neon-red hover:bg-red-600 text-white border-0 font-rajdhani"
-                    >
-                      Reply
-                    </Button>
-                  </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
 
-        {sortedTasks.length === 0 && (
-          <Card className="gaming-card text-center py-12">
-            <CardContent>
-              <p className="text-gray-400 font-rajdhani text-lg">No tasks found. Create your first task above!</p>
-            </CardContent>
-          </Card>
-        )}
+                {sortedTasks.length === 0 && (
+                  <Card className="gaming-card text-center py-12">
+                    <CardContent>
+                      <p className="text-gray-400 font-rajdhani text-lg">No tasks found. Create your first task above!</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              {/* Team Management Tab */}
+              <TabsContent value="team">
+                <TeamManagement />
+              </TabsContent>
+
+              {/* Car Management Tab */}
+              <TabsContent value="cars">
+                <CarManagement />
+              </TabsContent>
+
+              {/* Item Management Tab */}
+              <TabsContent value="items">
+                <ItemManagement />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
