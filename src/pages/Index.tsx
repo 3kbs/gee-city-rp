@@ -6,12 +6,12 @@ import RoadmapSection from '../components/RoadmapSection';
 import SocialSection from '../components/SocialSection';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
-import MatrixBackground from '../components/MatrixBackground';
+import SolidBackground from '../components/SolidBackground';
 
 const Index = () => {
   return (
     <div className="min-h-screen relative overflow-x-hidden">
-      <MatrixBackground />
+      <SolidBackground />
       <HeroSection />
       <HighlightsSection />
       <RoadmapSection />
