@@ -12,7 +12,7 @@ const ContactSection = () => {
             <span className="text-neon-red"> 🚀</span>
           </h2>
           <p className="font-rajdhani text-xl text-gray-400 mb-8">
-            Bist du bereit für die Zukunft des Roleplay? Dann schließe dich uns jetzt an und werde Teil der GEE City V2-Familie!
+            Bist du bereit für die Zukunft des Roleplay? Dann schließe dich uns jetzt an und werde Teil der GEE City-Familie!
           </p>
           
           <Button 
@@ -35,7 +35,7 @@ const ContactSection = () => {
             <div className="space-y-4">
               <div className="flex items-center text-gray-400">
                 <span className="text-xl mr-3">📧</span>
-                <span className="font-rajdhani">support@geecityv2.com</span>
+                <span className="font-rajdhani">support@geecity.com</span>
               </div>
               <div className="flex items-center text-gray-400">
                 <span className="text-xl mr-3">📞</span>
@@ -47,7 +47,7 @@ const ContactSection = () => {
           <div className="gaming-card">
             <h3 className="font-orbitron text-2xl font-bold text-white mb-6 flex items-center">
               <span className="text-2xl mr-3">🌟</span>
-              Warum GEE City V2?
+              Warum GEE City?
             </h3>
             <div className="space-y-4 font-rajdhani text-gray-300">
               <div className="flex items-start">

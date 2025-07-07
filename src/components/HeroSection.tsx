@@ -11,9 +11,6 @@ const HeroSection = () => {
         <div className="animate-fade-in-up">
           <h1 className="font-orbitron text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 tracking-tight">
             <span className="block">GEE CITY</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-neon-red to-red-400 neon-glow animate-glow-pulse">
-              V2
-            </span>
           </h1>
           
           <div className="relative">
@@ -29,7 +26,7 @@ const HeroSection = () => {
           </div>
 
           <p className="font-rajdhani text-lg md:text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            GEE City V2 ist die nächste Evolutionsstufe unseres geliebten FiveM Servers. 
+            GEE City ist die nächste Evolutionsstufe unseres geliebten FiveM Servers. 
             Mit einem komplett überarbeiteten System, neuen Features und einer fokussierten Community 
             möchten wir ein unvergessliches Spielerlebnis bieten.
           </p>

@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-8">
           <h3 className="font-orbitron text-3xl font-bold text-white mb-4">
-            <span className="text-neon-red">GEE CITY</span> V2
+            <span className="text-neon-red">GEE CITY</span>
           </h3>
           <p className="font-rajdhani text-gray-400 text-lg">
             Die Zukunft des Midcore Roleplay
@@ -25,7 +25,7 @@ const Footer = () => {
           </div>
 
           <div className="text-gray-500 font-rajdhani text-sm">
-            © 2024 GEE City V2. Alle Rechte vorbehalten.
+            © 2024 GEE City. Alle Rechte vorbehalten.
           </div>
         </div>
 

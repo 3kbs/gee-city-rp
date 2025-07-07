@@ -6,7 +6,7 @@ const socialLinks = [
   {
     name: 'Website',
     icon: '🌐',
-    url: 'www.geecityv2.com',
+    url: 'www.geecity.com',
     color: 'text-blue-400',
     hoverColor: 'hover:text-blue-300'
   },
@@ -20,14 +20,14 @@ const socialLinks = [
   {
     name: 'Instagram',
     icon: '📸',
-    url: '@GEECityV2',
+    url: '@GEECity',
     color: 'text-pink-400',
     hoverColor: 'hover:text-pink-300'
   },
   {
     name: 'YouTube',
     icon: '🎥',
-    url: 'GEE City V2',
+    url: 'GEE City',
     color: 'text-red-400',
     hoverColor: 'hover:text-red-300'
   }
@@ -76,12 +76,12 @@ const SocialSection = () => {
             Unser Versprechen an dich ❤️
           </h3>
           <p className="font-rajdhani text-lg text-gray-300 mb-6 leading-relaxed">
-            Die Transformation von GEE City hin zu Version 2.0 ist eine große Herausforderung, 
+            Die Transformation von GEE City ist eine große Herausforderung, 
             aber wir sind fest entschlossen, den besten Server zu schaffen, den die FiveM-Community je gesehen hat. 
             Deine Geduld und Unterstützung während dieser Zeit bedeuten uns sehr viel.
           </p>
           <div className="text-2xl text-neon-red font-orbitron font-bold neon-glow animate-glow-pulse">
-            🌟 Gemeinsam werden wir GEE City V2 zu einem Vorzeigeprojekt machen! 🌟
+            🌟 Gemeinsam werden wir GEE City zu einem Vorzeigeprojekt machen! 🌟
           </div>
         </div>
       </div>
