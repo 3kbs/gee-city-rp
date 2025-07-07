@@ -14,7 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cars: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          license_plate: string | null
+          make: string
+          model: string
+          name: string
+          owner_name: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+          year: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          license_plate?: string | null
+          make: string
+          model: string
+          name: string
+          owner_name?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          year?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          license_plate?: string | null
+          make?: string
+          model?: string
+          name?: string
+          owner_name?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shop_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          effects: string[] | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          rarity: string
+          requirements: string[] | null
+          stock: number
+          type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          effects?: string[] | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          rarity?: string
+          requirements?: string[] | null
+          stock?: number
+          type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          effects?: string[] | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          rarity?: string
+          requirements?: string[] | null
+          stock?: number
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          department: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          role: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          role: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
