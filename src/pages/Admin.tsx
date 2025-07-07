@@ -211,7 +211,7 @@ const Admin = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gaming-dark relative">
+    <div className="min-h-screen bg-gaming-dark">
       {/* Background effects */}
       <div className="fixed inset-0 bg-gradient-to-br from-gaming-dark via-gaming-gray to-gaming-dark opacity-90 pointer-events-none"></div>
       
@@ -220,13 +220,14 @@ const Admin = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="font-orbitron text-2xl font-bold text-white neon-glow">Admin Dashboard</h1>
-              <span className="text-gray-400 font-rajdhani">|</span>
-              <span className="text-neon-red font-rajdhani">{userEmail}</span>
+              <h1 className="font-orbitron text-xl md:text-2xl font-bold text-white neon-glow">Admin Dashboard</h1>
+              <span className="hidden md:inline text-gray-400 font-rajdhani">|</span>
+              <span className="hidden md:inline text-neon-red font-rajdhani text-sm">{userEmail}</span>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <Button 
                 variant="outline" 
+                size="sm"
                 onClick={handleLogout}
                 className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-all duration-300"
               >
@@ -234,6 +235,7 @@ const Admin = () => {
               </Button>
               <Button 
                 variant="outline" 
+                size="sm"
                 onClick={() => navigate('/')}
                 className="border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300"
               >
@@ -244,7 +246,59 @@ const Admin = () => {
         </div>
       </header>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+      {/* Main Dashboard Grid */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          
+          {/* Left Sidebar - Navigation & Quick Stats */}
+          <div className="lg:col-span-3 space-y-6">
+            {/* Quick Stats */}
+            <Card className="gaming-card border border-neon-red/30">
+              <CardHeader>
+                <h3 className="font-orbitron text-lg font-bold text-white neon-glow">📊 Quick Stats</h3>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 font-rajdhani">Total Tasks</span>
+                  <Badge className="bg-neon-red text-white">{tasks.length}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 font-rajdhani">Open Tasks</span>
+                  <Badge className="bg-green-500 text-white">{tasks.filter(t => t.status === 'open').length}</Badge>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 font-rajdhani">In Progress</span>
+                  <Badge className="bg-yellow-500 text-white">{tasks.filter(t => t.status === 'in-progress').length}</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Navigation Menu */}
+            <Card className="gaming-card border border-gaming-gray">
+              <CardHeader>
+                <h3 className="font-orbitron text-lg font-bold text-white">📋 Dashboard Menu</h3>
+              </CardHeader>
+              <CardContent>
+                <nav className="space-y-2">
+                  <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-gaming-gray">
+                    📝 Task Management
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-gaming-gray">
+                    👥 Team Management
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-gaming-gray">
+                    🚗 Content Management
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-gray-300 hover:text-white hover:bg-gaming-gray">
+                    ⚙️ System Settings
+                  </Button>
+                </nav>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="lg:col-span-9 space-y-6 md:space-y-8">
         {/* Create New Task */}
         <Card className="gaming-card border border-neon-red/30 mb-8">
           <CardHeader>
@@ -417,6 +471,8 @@ const Admin = () => {
             </CardContent>
           </Card>
         )}
+          </div>
+        </div>
       </div>
     </div>
   );
