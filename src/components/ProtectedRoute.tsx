@@ -35,6 +35,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }, []);
 
   if (loading) {
+    console.log('ProtectedRoute: Still loading...');
     return (
       <div className="min-h-screen bg-gaming-dark flex items-center justify-center">
         <div className="text-white font-rajdhani text-xl">Loading...</div>
@@ -43,9 +44,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
+    console.log('ProtectedRoute: No user found, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
+  console.log('ProtectedRoute: User authenticated, showing protected content');
   return <>{children}</>;
 };
 
