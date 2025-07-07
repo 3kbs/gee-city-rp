@@ -2,406 +2,445 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Cookie, TrendingUp, Zap, Factory, Crown, Award } from 'lucide-react';
 
-interface Player {
-  x: number;
-  y: number;
-  velocityY: number;
-  onGround: boolean;
-  width: number;
-  height: number;
+interface Generator {
+  id: string;
+  name: string;
+  baseCost: number;
+  baseProduction: number;
+  count: number;
+  icon: string;
+  description: string;
 }
 
-interface Platform {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+interface Upgrade {
+  id: string;
+  name: string;
+  cost: number;
+  multiplier: number;
+  description: string;
+  purchased: boolean;
+  icon: string;
+  type: 'click' | 'production' | 'generator';
+  targetGenerator?: string;
 }
 
-interface Coin {
-  x: number;
-  y: number;
-  collected: boolean;
-  width: number;
-  height: number;
-}
-
-interface Enemy {
-  x: number;
-  y: number;
-  velocityX: number;
-  width: number;
-  height: number;
+interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  requirement: number;
+  type: 'cookies' | 'clicks' | 'generators';
+  unlocked: boolean;
+  icon: string;
 }
 
 const Minigame = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const gameLoopRef = useRef<number>();
-  
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'gameOver'>('menu');
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
-  
-  const [player, setPlayer] = useState<Player>({
-    x: 50,
-    y: 300,
-    velocityY: 0,
-    onGround: false,
-    width: 32,
-    height: 32
-  });
+  const saveIntervalRef = useRef<NodeJS.Timeout>();
+  const productionIntervalRef = useRef<NodeJS.Timeout>();
 
-  const platforms: Platform[] = [
-    { x: 0, y: 400, width: 200, height: 20 },
-    { x: 250, y: 350, width: 150, height: 20 },
-    { x: 450, y: 300, width: 100, height: 20 },
-    { x: 600, y: 250, width: 120, height: 20 },
-    { x: 800, y: 200, width: 100, height: 20 },
-    { x: 950, y: 350, width: 150, height: 20 },
-    { x: 1150, y: 300, width: 100, height: 20 },
+  const [cookies, setCookies] = useState(0);
+  const [totalCookies, setTotalCookies] = useState(0);
+  const [clickValue, setClickValue] = useState(1);
+  const [cookiesPerSecond, setCookiesPerSecond] = useState(0);
+  const [totalClicks, setTotalClicks] = useState(0);
+  const [clickEffect, setClickEffect] = useState(false);
+
+  const initialGenerators: Generator[] = [
+    { id: 'cursor', name: 'Auto-Clicker', baseCost: 15, baseProduction: 0.1, count: 0, icon: '👆', description: 'Clicks the cookie for you' },
+    { id: 'grandma', name: 'Grandma', baseCost: 100, baseProduction: 1, count: 0, icon: '👵', description: 'A nice grandma to bake cookies' },
+    { id: 'farm', name: 'Cookie Farm', baseCost: 1100, baseProduction: 8, count: 0, icon: '🚜', description: 'Grows cookie plants' },
+    { id: 'mine', name: 'Cookie Mine', baseCost: 12000, baseProduction: 47, count: 0, icon: '⛏️', description: 'Mines cookie ore' },
+    { id: 'factory', name: 'Cookie Factory', baseCost: 130000, baseProduction: 260, count: 0, icon: '🏭', description: 'Mass produces cookies' },
+    { id: 'bank', name: 'Cookie Bank', baseCost: 1400000, baseProduction: 1400, count: 0, icon: '🏦', description: 'Generates cookies through interest' },
+    { id: 'temple', name: 'Cookie Temple', baseCost: 20000000, baseProduction: 7800, count: 0, icon: '⛩️', description: 'Monks bless cookies into existence' },
+    { id: 'portal', name: 'Cookie Portal', baseCost: 330000000, baseProduction: 44000, count: 0, icon: '🌀', description: 'Imports cookies from another dimension' },
   ];
 
-  const initialCoins: Coin[] = [
-    { x: 120, y: 360, collected: false, width: 20, height: 20 },
-    { x: 320, y: 310, collected: false, width: 20, height: 20 },
-    { x: 500, y: 260, collected: false, width: 20, height: 20 },
-    { x: 650, y: 210, collected: false, width: 20, height: 20 },
-    { x: 850, y: 160, collected: false, width: 20, height: 20 },
-    { x: 1000, y: 310, collected: false, width: 20, height: 20 },
+  const initialUpgrades: Upgrade[] = [
+    { id: 'click1', name: 'Reinforced Finger', cost: 100, multiplier: 2, description: 'Double click power', purchased: false, icon: '💪', type: 'click' },
+    { id: 'click2', name: 'Steel Mouse', cost: 1000, multiplier: 2, description: 'Double click power again', purchased: false, icon: '🖱️', type: 'click' },
+    { id: 'click3', name: 'Diamond Cursor', cost: 10000, multiplier: 3, description: 'Triple click power', purchased: false, icon: '💎', type: 'click' },
+    { id: 'production1', name: 'Cookie Blessing', cost: 50000, multiplier: 2, description: 'Double all production', purchased: false, icon: '✨', type: 'production' },
+    { id: 'cursor1', name: 'Faster Cursors', cost: 1000, multiplier: 2, description: 'Double cursor efficiency', purchased: false, icon: '⚡', type: 'generator', targetGenerator: 'cursor' },
+    { id: 'grandma1', name: 'Cookie Recipes', cost: 5000, multiplier: 2, description: 'Double grandma efficiency', purchased: false, icon: '📖', type: 'generator', targetGenerator: 'grandma' },
   ];
 
-  const initialEnemies: Enemy[] = [
-    { x: 300, y: 320, velocityX: -1, width: 24, height: 24 },
-    { x: 700, y: 220, velocityX: 1, width: 24, height: 24 },
-    { x: 1100, y: 270, velocityX: -1, width: 24, height: 24 },
+  const initialAchievements: Achievement[] = [
+    { id: 'first_cookie', name: 'First Cookie', description: 'Bake your first cookie', requirement: 1, type: 'cookies', unlocked: false, icon: '🍪' },
+    { id: 'hundred_cookies', name: 'Cookie Apprentice', description: 'Bake 100 cookies', requirement: 100, type: 'cookies', unlocked: false, icon: '👨‍🍳' },
+    { id: 'thousand_cookies', name: 'Cookie Master', description: 'Bake 1,000 cookies', requirement: 1000, type: 'cookies', unlocked: false, icon: '👑' },
+    { id: 'million_cookies', name: 'Cookie Legend', description: 'Bake 1,000,000 cookies', requirement: 1000000, type: 'cookies', unlocked: false, icon: '🏆' },
+    { id: 'hundred_clicks', name: 'Clicker', description: 'Click 100 times', requirement: 100, type: 'clicks', unlocked: false, icon: '👆' },
+    { id: 'first_generator', name: 'Automation', description: 'Buy your first generator', requirement: 1, type: 'generators', unlocked: false, icon: '🤖' },
   ];
 
-  const [coins, setCoins] = useState<Coin[]>(initialCoins);
-  const [enemies, setEnemies] = useState<Enemy[]>(initialEnemies);
-  const [keys, setKeys] = useState<{[key: string]: boolean}>({});
-  const [cameraX, setCameraX] = useState(0);
+  const [generators, setGenerators] = useState<Generator[]>(initialGenerators);
+  const [upgrades, setUpgrades] = useState<Upgrade[]>(initialUpgrades);
+  const [achievements, setAchievements] = useState<Achievement[]>(initialAchievements);
 
-  // Handle keyboard input
+  // Load save data
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      setKeys(prev => ({ ...prev, [e.code]: true }));
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      e.preventDefault();
-      setKeys(prev => ({ ...prev, [e.code]: false }));
-    };
-
-    if (gameState === 'playing') {
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('keyup', handleKeyUp);
+    const savedData = localStorage.getItem('cookieClickerSave');
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        setCookies(data.cookies || 0);
+        setTotalCookies(data.totalCookies || 0);
+        setClickValue(data.clickValue || 1);
+        setTotalClicks(data.totalClicks || 0);
+        setGenerators(data.generators || initialGenerators);
+        setUpgrades(data.upgrades || initialUpgrades);
+        setAchievements(data.achievements || initialAchievements);
+      } catch (error) {
+        console.error('Failed to load save data:', error);
+      }
     }
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [gameState]);
-
-  // Collision detection
-  const checkCollision = useCallback((rect1: any, rect2: any) => {
-    return rect1.x < rect2.x + rect2.width &&
-           rect1.x + rect1.width > rect2.x &&
-           rect1.y < rect2.y + rect2.height &&
-           rect1.y + rect1.height > rect2.y;
   }, []);
 
-  // Game loop
+  // Auto-save
   useEffect(() => {
-    if (gameState !== 'playing') {
-      if (gameLoopRef.current) {
-        cancelAnimationFrame(gameLoopRef.current);
-      }
-      return;
-    }
-
-    let lastTime = 0;
-    const FIXED_TIMESTEP = 1000 / 60; // 60 FPS
-
-    const gameLoop = (currentTime: number) => {
-      if (currentTime - lastTime >= FIXED_TIMESTEP) {
-        // Update player
-        setPlayer(prevPlayer => {
-          let newPlayer = { ...prevPlayer };
-          
-          // Apply gravity
-          newPlayer.velocityY += 0.5;
-          newPlayer.y += newPlayer.velocityY;
-          newPlayer.onGround = false;
-
-          // Handle movement
-          const moveSpeed = 3;
-          if (keys['ArrowLeft'] || keys['KeyA']) {
-            newPlayer.x -= moveSpeed;
-          }
-          if (keys['ArrowRight'] || keys['KeyD']) {
-            newPlayer.x += moveSpeed;
-          }
-          if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && prevPlayer.onGround) {
-            newPlayer.velocityY = -12;
-          }
-
-          // Platform collision
-          platforms.forEach(platform => {
-            if (checkCollision(newPlayer, platform)) {
-              // Landing on top of platform
-              if (prevPlayer.y + prevPlayer.height <= platform.y + 5 && newPlayer.velocityY >= 0) {
-                newPlayer.y = platform.y - newPlayer.height;
-                newPlayer.velocityY = 0;
-                newPlayer.onGround = true;
-              }
-            }
-          });
-
-          // Ground collision
-          if (newPlayer.y >= 420 - newPlayer.height) {
-            newPlayer.y = 420 - newPlayer.height;
-            newPlayer.velocityY = 0;
-            newPlayer.onGround = true;
-          }
-
-          // Boundary check
-          if (newPlayer.x < 0) newPlayer.x = 0;
-          if (newPlayer.x > 1200 - newPlayer.width) newPlayer.x = 1200 - newPlayer.width;
-
-          // Death by falling
-          if (newPlayer.y > 500) {
-            setLives(prev => {
-              const newLives = prev - 1;
-              if (newLives <= 0) {
-                setGameState('gameOver');
-              }
-              return newLives;
-            });
-            // Reset player position
-            newPlayer.x = 50;
-            newPlayer.y = 300;
-            newPlayer.velocityY = 0;
-          }
-
-          return newPlayer;
-        });
-
-        // Update camera
-        setCameraX(prevCamera => {
-          const targetCamera = Math.max(0, Math.min(player.x - 300, 600));
-          return prevCamera + (targetCamera - prevCamera) * 0.05;
-        });
-
-        // Update enemies
-        setEnemies(prevEnemies => 
-          prevEnemies.map(enemy => {
-            let newEnemy = { ...enemy };
-            newEnemy.x += newEnemy.velocityX;
-            
-            // Simple boundary bouncing
-            if (newEnemy.x <= 0 || newEnemy.x >= 1200 - newEnemy.width) {
-              newEnemy.velocityX *= -1;
-            }
-
-            return newEnemy;
-          })
-        );
-
-        // Check coin collection
-        setCoins(prevCoins => 
-          prevCoins.map(coin => {
-            if (!coin.collected && checkCollision(player, coin)) {
-              setScore(prev => prev + 100);
-              return { ...coin, collected: true };
-            }
-            return coin;
-          })
-        );
-
-        // Check enemy collision
-        enemies.forEach(enemy => {
-          if (checkCollision(player, enemy)) {
-            setLives(prev => {
-              const newLives = prev - 1;
-              if (newLives <= 0) {
-                setGameState('gameOver');
-              }
-              return newLives;
-            });
-            // Reset player position
-            setPlayer(prev => ({ ...prev, x: 50, y: 300, velocityY: 0 }));
-          }
-        });
-
-        lastTime = currentTime;
-      }
-
-      gameLoopRef.current = requestAnimationFrame(gameLoop);
-    };
-
-    gameLoopRef.current = requestAnimationFrame(gameLoop);
+    saveIntervalRef.current = setInterval(() => {
+      const saveData = {
+        cookies,
+        totalCookies,
+        clickValue,
+        totalClicks,
+        generators,
+        upgrades,
+        achievements,
+        lastSave: Date.now()
+      };
+      localStorage.setItem('cookieClickerSave', JSON.stringify(saveData));
+    }, 5000);
 
     return () => {
-      if (gameLoopRef.current) {
-        cancelAnimationFrame(gameLoopRef.current);
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
       }
     };
-  }, [gameState, keys, player, enemies, checkCollision]);
+  }, [cookies, totalCookies, clickValue, totalClicks, generators, upgrades, achievements]);
 
-  const startGame = () => {
-    setGameState('playing');
-    setScore(0);
-    setLives(3);
-    setPlayer({ x: 50, y: 300, velocityY: 0, onGround: false, width: 32, height: 32 });
-    setCameraX(0);
-    setCoins(initialCoins);
-    setEnemies(initialEnemies);
+  // Calculate cookies per second
+  useEffect(() => {
+    let cps = 0;
+    generators.forEach(generator => {
+      let production = generator.baseProduction * generator.count;
+      
+      // Apply generator-specific upgrades
+      upgrades.forEach(upgrade => {
+        if (upgrade.purchased && upgrade.type === 'generator' && upgrade.targetGenerator === generator.id) {
+          production *= upgrade.multiplier;
+        }
+      });
+
+      // Apply global production upgrades
+      upgrades.forEach(upgrade => {
+        if (upgrade.purchased && upgrade.type === 'production') {
+          production *= upgrade.multiplier;
+        }
+      });
+
+      cps += production;
+    });
+    setCookiesPerSecond(cps);
+  }, [generators, upgrades]);
+
+  // Production loop
+  useEffect(() => {
+    if (cookiesPerSecond > 0) {
+      productionIntervalRef.current = setInterval(() => {
+        const production = cookiesPerSecond / 10; // Update 10 times per second for smoothness
+        setCookies(prev => prev + production);
+        setTotalCookies(prev => prev + production);
+      }, 100);
+    }
+
+    return () => {
+      if (productionIntervalRef.current) {
+        clearInterval(productionIntervalRef.current);
+      }
+    };
+  }, [cookiesPerSecond]);
+
+  // Check achievements
+  useEffect(() => {
+    setAchievements(prev => prev.map(achievement => {
+      if (achievement.unlocked) return achievement;
+
+      let progress = 0;
+      switch (achievement.type) {
+        case 'cookies':
+          progress = totalCookies;
+          break;
+        case 'clicks':
+          progress = totalClicks;
+          break;
+        case 'generators':
+          progress = generators.reduce((sum, gen) => sum + gen.count, 0);
+          break;
+      }
+
+      if (progress >= achievement.requirement) {
+        toast({
+          title: "Achievement Unlocked! 🏆",
+          description: `${achievement.name}: ${achievement.description}`,
+        });
+        return { ...achievement, unlocked: true };
+      }
+      return achievement;
+    }));
+  }, [totalCookies, totalClicks, generators, toast]);
+
+  const handleCookieClick = () => {
+    let currentClickValue = clickValue;
+    
+    // Apply click upgrades
+    upgrades.forEach(upgrade => {
+      if (upgrade.purchased && upgrade.type === 'click') {
+        currentClickValue *= upgrade.multiplier;
+      }
+    });
+
+    setCookies(prev => prev + currentClickValue);
+    setTotalCookies(prev => prev + currentClickValue);
+    setTotalClicks(prev => prev + 1);
+    
+    // Click effect animation
+    setClickEffect(true);
+    setTimeout(() => setClickEffect(false), 150);
+  };
+
+  const buyGenerator = (generatorId: string) => {
+    const generator = generators.find(g => g.id === generatorId);
+    if (!generator) return;
+
+    const cost = Math.floor(generator.baseCost * Math.pow(1.15, generator.count));
+    
+    if (cookies >= cost) {
+      setCookies(prev => prev - cost);
+      setGenerators(prev => prev.map(g => 
+        g.id === generatorId ? { ...g, count: g.count + 1 } : g
+      ));
+      
+      toast({
+        title: "Generator Purchased! 🏪",
+        description: `Bought ${generator.name} for ${formatNumber(cost)} cookies`,
+      });
+    }
+  };
+
+  const buyUpgrade = (upgradeId: string) => {
+    const upgrade = upgrades.find(u => u.id === upgradeId);
+    if (!upgrade || upgrade.purchased) return;
+
+    if (cookies >= upgrade.cost) {
+      setCookies(prev => prev - upgrade.cost);
+      setUpgrades(prev => prev.map(u => 
+        u.id === upgradeId ? { ...u, purchased: true } : u
+      ));
+      
+      if (upgrade.type === 'click') {
+        setClickValue(prev => prev * upgrade.multiplier);
+      }
+      
+      toast({
+        title: "Upgrade Purchased! ⬆️",
+        description: `${upgrade.name}: ${upgrade.description}`,
+      });
+    }
+  };
+
+  const formatNumber = (num: number): string => {
+    if (num < 1000) return Math.floor(num).toString();
+    if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+    if (num < 1000000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num < 1000000000000) return (num / 1000000000).toFixed(1) + 'B';
+    return (num / 1000000000000).toFixed(1) + 'T';
   };
 
   const resetGame = () => {
-    setGameState('menu');
-    setScore(0);
-    setLives(3);
+    localStorage.removeItem('cookieClickerSave');
+    setCookies(0);
+    setTotalCookies(0);
+    setClickValue(1);
+    setTotalClicks(0);
+    setGenerators(initialGenerators);
+    setUpgrades(initialUpgrades);
+    setAchievements(initialAchievements);
+    toast({
+      title: "Game Reset! 🔄",
+      description: "Starting fresh with a new bakery!",
+    });
   };
 
-  if (gameState === 'menu') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="font-orbitron text-6xl font-bold mb-8">🍄 MARIO QUEST</h1>
-          <p className="font-rajdhani text-xl mb-8">Use ARROW KEYS or WASD to move and jump!</p>
-          <div className="flex gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={startGame}
-              className="font-orbitron font-bold text-lg px-8 py-4 bg-green-500 hover:bg-green-600"
-            >
-              🎮 START GAME
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => navigate('/')}
-              className="font-rajdhani font-semibold text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-blue-600"
-            >
-              🏠 HOME
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (gameState === 'gameOver') {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-red-400 to-red-600 flex items-center justify-center">
-        <div className="text-center text-white">
-          <h1 className="font-orbitron text-6xl font-bold mb-4">💀 GAME OVER</h1>
-          <p className="font-rajdhani text-2xl mb-4">Final Score: {score}</p>
-          <div className="flex gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={startGame}
-              className="font-orbitron font-bold text-lg px-8 py-4 bg-green-500 hover:bg-green-600"
-            >
-              🔄 PLAY AGAIN
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => navigate('/')}
-              className="font-rajdhani font-semibold text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-red-600"
-            >
-              🏠 HOME
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-400 to-blue-600 overflow-hidden">
-      {/* HUD */}
-      <div className="fixed top-4 left-4 z-10 text-white font-orbitron">
-        <div className="bg-black/50 px-4 py-2 rounded">
-          <div>Score: {score}</div>
-          <div>Lives: {'❤️'.repeat(lives)}</div>
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="font-orbitron text-4xl font-bold text-amber-800 flex items-center gap-2">
+            <Cookie className="w-8 h-8" />
+            Cookie Empire
+          </h1>
+          <p className="text-amber-600 font-rajdhani">Build your cookie empire!</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate('/')}>
+            🏠 Home
+          </Button>
+          <Button variant="destructive" onClick={resetGame}>
+            🔄 Reset
+          </Button>
         </div>
       </div>
 
-      {/* Game Area */}
-      <div 
-        className="relative w-full h-screen overflow-hidden"
-        style={{ transform: `translateX(${-cameraX}px)` }}
-      >
-        {/* Platforms */}
-        {platforms.map((platform, i) => (
-          <div
-            key={`platform-${i}`}
-            className="absolute bg-green-600 border-2 border-green-800"
-            style={{
-              left: platform.x,
-              top: platform.y,
-              width: platform.width,
-              height: platform.height,
-            }}
-          />
-        ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Cookie Area */}
+        <div className="lg:col-span-2">
+          <Card className="mb-6">
+            <CardContent className="p-8 text-center">
+              <div className="mb-4">
+                <div className="text-6xl font-bold text-amber-800 mb-2">
+                  {formatNumber(cookies)} 🍪
+                </div>
+                <div className="text-lg text-amber-600">
+                  {formatNumber(cookiesPerSecond)} cookies per second
+                </div>
+                <div className="text-sm text-amber-500">
+                  Total baked: {formatNumber(totalCookies)} | Clicks: {totalClicks}
+                </div>
+              </div>
+              
+              <button
+                onClick={handleCookieClick}
+                className={`text-8xl hover:scale-110 active:scale-95 transition-all duration-150 cursor-pointer select-none ${
+                  clickEffect ? 'scale-125' : ''
+                }`}
+                style={{ filter: clickEffect ? 'brightness(1.3)' : 'none' }}
+              >
+                🍪
+              </button>
+              
+              <div className="mt-4 text-lg text-amber-700">
+                Click value: {formatNumber(clickValue * upgrades.filter(u => u.purchased && u.type === 'click').reduce((acc, u) => acc * u.multiplier, 1))}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Coins */}
-        {coins.map((coin, i) => (
-          !coin.collected && (
-            <div
-              key={`coin-${i}`}
-              className="absolute text-xl"
-              style={{
-                left: coin.x,
-                top: coin.y,
-              }}
-            >
-              🪙
-            </div>
-          )
-        ))}
-
-        {/* Enemies */}
-        {enemies.map((enemy, i) => (
-          <div
-            key={`enemy-${i}`}
-            className="absolute text-xl"
-            style={{
-              left: enemy.x,
-              top: enemy.y,
-            }}
-          >
-            👾
-          </div>
-        ))}
-
-        {/* Player */}
-        <div
-          className="absolute text-2xl"
-          style={{
-            left: player.x,
-            top: player.y,
-            transform: keys['ArrowLeft'] || keys['KeyA'] ? 'scaleX(-1)' : 'scaleX(1)',
-          }}
-        >
-          🍄
+          {/* Achievements */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="w-5 h-5" />
+                Achievements ({achievements.filter(a => a.unlocked).length}/{achievements.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {achievements.map(achievement => (
+                  <div
+                    key={achievement.id}
+                    className={`p-2 rounded border text-center ${
+                      achievement.unlocked 
+                        ? 'bg-yellow-100 border-yellow-300' 
+                        : 'bg-gray-100 border-gray-300 opacity-50'
+                    }`}
+                  >
+                    <div className="text-lg">{achievement.icon}</div>
+                    <div className="text-xs font-semibold">{achievement.name}</div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Ground */}
-        <div className="absolute bottom-0 w-full h-20 bg-green-800" />
-      </div>
+        {/* Store */}
+        <div className="space-y-6">
+          {/* Generators */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Factory className="w-5 h-5" />
+                Generators
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {generators.map(generator => {
+                const cost = Math.floor(generator.baseCost * Math.pow(1.15, generator.count));
+                const canAfford = cookies >= cost;
+                
+                return (
+                  <Button
+                    key={generator.id}
+                    variant={canAfford ? "default" : "outline"}
+                    className="w-full p-3 h-auto justify-between"
+                    onClick={() => buyGenerator(generator.id)}
+                    disabled={!canAfford}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{generator.icon}</span>
+                      <div className="text-left">
+                        <div className="font-semibold">{generator.name}</div>
+                        <div className="text-xs opacity-75">{generator.description}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold">{formatNumber(cost)}</div>
+                      <Badge variant="secondary">{generator.count}</Badge>
+                    </div>
+                  </Button>
+                );
+              })}
+            </CardContent>
+          </Card>
 
-      {/* Instructions */}
-      <div className="fixed bottom-4 left-4 text-white font-rajdhani text-sm bg-black/50 px-3 py-2 rounded">
-        Arrow Keys / WASD: Move & Jump • Collect coins! • Avoid enemies!
+          {/* Upgrades */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Upgrades
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {upgrades.filter(upgrade => !upgrade.purchased).map(upgrade => {
+                const canAfford = cookies >= upgrade.cost;
+                
+                return (
+                  <Button
+                    key={upgrade.id}
+                    variant={canAfford ? "default" : "outline"}
+                    className="w-full p-3 h-auto justify-between"
+                    onClick={() => buyUpgrade(upgrade.id)}
+                    disabled={!canAfford}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{upgrade.icon}</span>
+                      <div className="text-left">
+                        <div className="font-semibold">{upgrade.name}</div>
+                        <div className="text-xs opacity-75">{upgrade.description}</div>
+                      </div>
+                    </div>
+                    <div className="font-bold">{formatNumber(upgrade.cost)}</div>
+                  </Button>
+                );
+              })}
+              {upgrades.every(upgrade => upgrade.purchased) && (
+                <div className="text-center text-gray-500 py-4">
+                  All upgrades purchased! 🎉
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
