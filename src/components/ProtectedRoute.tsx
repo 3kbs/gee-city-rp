@@ -13,7 +13,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
+      console.log('ProtectedRoute: Checking initial session...');
       const { data: { session } } = await supabase.auth.getSession();
+      console.log('ProtectedRoute: Session result:', session);
       setUser(session?.user ?? null);
       setLoading(false);
     };
@@ -23,6 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log('ProtectedRoute: Auth state change:', event, session);
         setUser(session?.user ?? null);
         setLoading(false);
       }

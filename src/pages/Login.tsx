@@ -19,18 +19,23 @@ const Login = () => {
     setLoading(true);
 
     try {
+      console.log('Login: Attempting login with:', email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email,
         password: password,
       });
 
+      console.log('Login: Auth response:', { data, error });
+
       if (error) {
+        console.log('Login: Error occurred:', error);
         toast({
           title: "Login Failed",
           description: error.message,
           variant: "destructive",
         });
       } else {
+        console.log('Login: Success, navigating to /admin');
         toast({
           title: "Login Successful",
           description: "Welcome to the admin dashboard!",
@@ -38,6 +43,7 @@ const Login = () => {
         navigate('/admin');
       }
     } catch (error) {
+      console.log('Login: Catch block error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
