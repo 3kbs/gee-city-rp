@@ -42,7 +42,7 @@ const RoadmapSection = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="font-orbitron text-4xl md:text-5xl font-bold text-white mb-6">
-            Roadmap zur Vollendung von GEE City V2
+            Roadmap zur Vollendung von GEE City v 0.7
             <span className="text-neon-red"> 🗓️</span>
           </h2>
           <p className="font-rajdhani text-xl text-gray-400 max-w-3xl mx-auto">
