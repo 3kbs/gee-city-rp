@@ -1,5 +1,6 @@
-// Simple auth service using localStorage for demo purposes
+// Enhanced auth service with cookie persistence
 // Replace with proper Supabase integration when available
+import Cookies from 'js-cookie';
 
 export interface User {
   id: string;
@@ -11,11 +12,17 @@ export interface AuthSession {
   access_token: string;
 }
 
+// Demo admin credentials - will be replaced with proper Supabase auth
 const DEMO_ADMIN_EMAIL = 'admin@geecity.com';
 const DEMO_ADMIN_PASSWORD = 'admin123';
 
 class AuthService {
-  private storageKey = 'gee_city_auth_session';
+  private cookieKey = 'gee_city_auth_session';
+  private cookieOptions = {
+    expires: 7, // 7 days
+    secure: window.location.protocol === 'https:',
+    sameSite: 'strict' as const
+  };
 
   async signInWithPassword(credentials: { email: string; password: string }) {
     // Demo authentication - replace with real Supabase calls
@@ -28,7 +35,7 @@ class AuthService {
         access_token: 'demo_token_' + Date.now(),
       };
       
-      localStorage.setItem(this.storageKey, JSON.stringify(session));
+      Cookies.set(this.cookieKey, JSON.stringify(session), this.cookieOptions);
       return { data: { session }, error: null };
     } else {
       return { data: { session: null }, error: { message: 'Invalid credentials' } };
@@ -36,13 +43,13 @@ class AuthService {
   }
 
   async getSession() {
-    const stored = localStorage.getItem(this.storageKey);
+    const stored = Cookies.get(this.cookieKey);
     if (stored) {
       try {
         const session = JSON.parse(stored);
         return { data: { session }, error: null };
       } catch {
-        localStorage.removeItem(this.storageKey);
+        Cookies.remove(this.cookieKey);
       }
     }
     return { data: { session: null }, error: null };
@@ -54,7 +61,7 @@ class AuthService {
   }
 
   async signOut() {
-    localStorage.removeItem(this.storageKey);
+    Cookies.remove(this.cookieKey);
     return { error: null };
   }
 
