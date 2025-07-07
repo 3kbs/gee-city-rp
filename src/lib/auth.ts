@@ -14,7 +14,7 @@ export interface AuthSession {
 
 // Demo admin credentials - will be replaced with proper Supabase auth
 const DEMO_ADMIN_EMAIL = 'admin@geecity.com';
-const DEMO_ADMIN_PASSWORD = 'admin123';
+const DEMO_ADMIN_PASSWORD = 'GWQIFTZWTCW124124!"§!"§';
 
 class AuthService {
   private cookieKey = 'gee_city_auth_session';
