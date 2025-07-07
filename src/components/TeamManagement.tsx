@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,15 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Users, UserPlus, Settings, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TeamMember {
-  id: number;
+  id: string;
   name: string;
-  email: string;
+  email?: string;
   role: string;
-  permissions: string[];
-  lastActive: Date;
-  status: 'active' | 'inactive';
+  phone?: string;
+  avatar_url?: string;
+  department?: string;
+  status: 'active' | 'inactive' | 'pending';
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface Role {
@@ -37,36 +41,8 @@ const AVAILABLE_PERMISSIONS = [
 
 const TeamManagement = () => {
   const { toast } = useToast();
-
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    {
-      id: 1,
-      name: 'John Admin',
-      email: 'admin@geecity.com',
-      role: 'Super Admin',
-      permissions: AVAILABLE_PERMISSIONS,
-      lastActive: new Date('2024-01-20'),
-      status: 'active'
-    },
-    {
-      id: 2,
-      name: 'Sarah Manager',
-      email: 'sarah@geecity.com',
-      role: 'Content Manager',
-      permissions: ['manage_content', 'manage_vehicles', 'manage_shop'],
-      lastActive: new Date('2024-01-19'),
-      status: 'active'
-    },
-    {
-      id: 3,
-      name: 'Mike Support',
-      email: 'mike@geecity.com',
-      role: 'Support Agent',
-      permissions: ['view_analytics', 'moderate_chat'],
-      lastActive: new Date('2024-01-18'),
-      status: 'inactive'
-    }
-  ]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [roles, setRoles] = useState<Role[]>([
     {
@@ -90,86 +66,132 @@ const TeamManagement = () => {
     name: '',
     email: '',
     role: '',
-    permissions: [] as string[]
+    phone: '',
+    department: ''
   });
 
-  const [editingRole, setEditingRole] = useState<string | null>(null);
-  const [editPermissions, setEditPermissions] = useState<string[]>([]);
+  // Load team members from database
+  useEffect(() => {
+    fetchTeamMembers();
+  }, []);
 
-  const handleAddMember = () => {
-    if (!newMember.name || !newMember.email || !newMember.role) {
+  const fetchTeamMembers = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setTeamMembers((data || []).map(member => ({
+        ...member,
+        status: member.status as 'active' | 'inactive' | 'pending'
+      })));
+    } catch (error) {
+      console.error('Error fetching team members:', error);
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Failed to load team members",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!newMember.name || !newMember.role) {
+      toast({
+        title: "Error",
+        description: "Please fill in name and role",
         variant: "destructive",
       });
       return;
     }
 
-    const selectedRole = roles.find(r => r.id === newMember.role);
-    const member: TeamMember = {
-      id: Date.now(),
-      name: newMember.name,
-      email: newMember.email,
-      role: selectedRole?.name || newMember.role,
-      permissions: selectedRole?.permissions || [],
-      lastActive: new Date(),
-      status: 'active'
-    };
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to add team members",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    setTeamMembers([...teamMembers, member]);
-    setNewMember({ name: '', email: '', role: '', permissions: [] });
-    
-    toast({
-      title: "Team Member Added",
-      description: `${member.name} has been added to the team`,
-    });
+      const { data, error } = await supabase
+        .from('team_members')
+        .insert({
+          name: newMember.name,
+          email: newMember.email,
+          role: newMember.role,
+          phone: newMember.phone,
+          department: newMember.department,
+          status: 'active',
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const typedMember = {
+        ...data,
+        status: data.status as 'active' | 'inactive' | 'pending'
+      };
+      setTeamMembers([typedMember, ...teamMembers]);
+      setNewMember({ name: '', email: '', role: '', phone: '', department: '' });
+      
+      toast({
+        title: "Team Member Added",
+        description: `${data.name} has been added to the team`,
+      });
+    } catch (error) {
+      console.error('Error adding team member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add team member",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleRemoveMember = (id: number) => {
-    setTeamMembers(teamMembers.filter(member => member.id !== id));
-    toast({
-      title: "Member Removed",
-      description: "Team member has been removed",
-    });
+  const handleRemoveMember = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('team_members')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setTeamMembers(teamMembers.filter(member => member.id !== id));
+      toast({
+        title: "Member Removed",
+        description: "Team member has been removed",
+      });
+    } catch (error) {
+      console.error('Error removing team member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove team member",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleTogglePermission = (permission: string) => {
-    setEditPermissions(prev => 
-      prev.includes(permission) 
-        ? prev.filter(p => p !== permission)
-        : [...prev, permission]
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-white font-rajdhani">Loading team members...</div>
+      </div>
     );
-  };
-
-  const handleSaveRolePermissions = (roleId: string) => {
-    setRoles(roles.map(role => 
-      role.id === roleId 
-        ? { ...role, permissions: editPermissions }
-        : role
-    ));
-    
-    // Update team members with this role
-    setTeamMembers(teamMembers.map(member => {
-      const memberRole = roles.find(r => r.name === member.role);
-      return memberRole?.id === roleId 
-        ? { ...member, permissions: editPermissions }
-        : member;
-    }));
-
-    setEditingRole(null);
-    setEditPermissions([]);
-    
-    toast({
-      title: "Permissions Updated",
-      description: "Role permissions have been saved",
-    });
-  };
-
-  const startEditingRole = (role: Role) => {
-    setEditingRole(role.id);
-    setEditPermissions([...role.permissions]);
-  };
+  }
 
   return (
     <div className="space-y-6">
@@ -182,9 +204,9 @@ const TeamManagement = () => {
           </h3>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Input
-              placeholder="Full Name"
+              placeholder="Full Name *"
               value={newMember.name}
               onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
               className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
@@ -196,18 +218,24 @@ const TeamManagement = () => {
               onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
               className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
             />
-            <Select value={newMember.role} onValueChange={(value) => setNewMember({ ...newMember, role: value })}>
-              <SelectTrigger className="bg-gaming-gray border-gaming-gray text-white">
-                <SelectValue placeholder="Select Role" />
-              </SelectTrigger>
-              <SelectContent className="bg-gaming-gray border-gaming-gray">
-                {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.id} className="text-white hover:bg-gaming-dark">
-                    {role.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              placeholder="Role *"
+              value={newMember.role}
+              onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
+            <Input
+              placeholder="Phone Number"
+              value={newMember.phone}
+              onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
+            <Input
+              placeholder="Department"
+              value={newMember.department}
+              onChange={(e) => setNewMember({ ...newMember, department: e.target.value })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
           </div>
           <Button 
             onClick={handleAddMember}
@@ -240,15 +268,10 @@ const TeamManagement = () => {
                       {member.role}
                     </Badge>
                   </div>
-                  <p className="text-gray-300 text-sm mb-1">{member.email}</p>
-                  <p className="text-gray-400 text-xs">Last active: {member.lastActive.toLocaleDateString()}</p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {member.permissions.map((permission) => (
-                      <Badge key={permission} variant="outline" className="text-xs text-blue-400 border-blue-400">
-                        {permission.replace('_', ' ')}
-                      </Badge>
-                    ))}
-                  </div>
+                  {member.email && <p className="text-gray-300 text-sm mb-1">{member.email}</p>}
+                  {member.phone && <p className="text-gray-300 text-sm mb-1">Phone: {member.phone}</p>}
+                  {member.department && <p className="text-gray-300 text-sm mb-1">Department: {member.department}</p>}
+                  <p className="text-gray-400 text-xs">Created: {member.created_at ? new Date(member.created_at).toLocaleDateString() : 'N/A'}</p>
                 </div>
                 <Button 
                   variant="outline" 
@@ -264,79 +287,6 @@ const TeamManagement = () => {
         </CardContent>
       </Card>
 
-      {/* Role Permissions Management */}
-      <Card className="gaming-card border border-gaming-gray">
-        <CardHeader>
-          <h3 className="font-orbitron text-lg font-bold text-white flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            Role Permissions
-          </h3>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {roles.map((role) => (
-              <div key={role.id} className="p-4 bg-gaming-dark/30 rounded-lg border border-gaming-gray/30">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-orbitron text-white font-semibold">{role.name}</h4>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => startEditingRole(role)}
-                    className="border-neon-red text-neon-red hover:bg-neon-red hover:text-white"
-                  >
-                    Edit Permissions
-                  </Button>
-                </div>
-                
-                {editingRole === role.id ? (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {AVAILABLE_PERMISSIONS.map((permission) => (
-                        <div key={permission} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`${role.id}-${permission}`}
-                            checked={editPermissions.includes(permission)}
-                            onCheckedChange={() => handleTogglePermission(permission)}
-                          />
-                          <label 
-                            htmlFor={`${role.id}-${permission}`}
-                            className="text-sm text-gray-300 cursor-pointer"
-                          >
-                            {permission.replace('_', ' ')}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={() => handleSaveRolePermissions(role.id)}
-                        className="bg-neon-red hover:bg-red-600 text-white border-0 font-rajdhani"
-                      >
-                        Save Changes
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => setEditingRole(null)}
-                        className="border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {role.permissions.map((permission) => (
-                      <Badge key={permission} variant="outline" className="text-xs text-blue-400 border-blue-400">
-                        {permission.replace('_', ' ')}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

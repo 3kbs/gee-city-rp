@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,20 +7,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Package, Plus, Trash2, Edit } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ShopItem {
-  id: number;
+  id: string;
   name: string;
   category: string;
   type: string;
   price: number;
-  description: string;
-  imageUrl: string;
+  description?: string;
+  image_url?: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   stock: number;
   effects?: string[];
   requirements?: string[];
-  createdAt: Date;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const ITEM_CATEGORIES = [
@@ -54,51 +56,41 @@ const RARITY_COLORS = {
 
 const ItemManagement = () => {
   const { toast } = useToast();
+  const [items, setItems] = useState<ShopItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [items, setItems] = useState<ShopItem[]>([
-    {
-      id: 1,
-      name: 'Ceramic Pistol',
-      category: 'Weapons',
-      type: 'Pistol',
-      price: 5000,
-      description: 'High-quality ceramic pistol with excellent durability',
-      imageUrl: 'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=400',
-      rarity: 'rare',
-      stock: 25,
-      effects: ['Damage: 35', 'Range: Medium', 'Stealth: High'],
-      requirements: ['Level 15', 'Gun License'],
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      id: 2,
-      name: 'Designer Hoodie',
-      category: 'Clothing',
-      type: 'Jackets',
-      price: 150,
-      description: 'Premium streetwear hoodie with custom designs',
-      imageUrl: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400',
-      rarity: 'common',
-      stock: 100,
-      effects: ['Style: +5', 'Warmth: +3'],
-      requirements: [],
-      createdAt: new Date('2024-01-12')
-    },
-    {
-      id: 3,
-      name: 'Turbo Kit',
-      category: 'Vehicles Parts',
-      type: 'Engine',
-      price: 25000,
-      description: 'High-performance turbo kit for sports cars',
-      imageUrl: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400',
-      rarity: 'epic',
-      stock: 5,
-      effects: ['Power: +150 HP', 'Speed: +25%', 'Fuel Consumption: +20%'],
-      requirements: ['Mechanic Level 8', 'Compatible Vehicle'],
-      createdAt: new Date('2024-01-08')
+  // Load items from database
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const fetchItems = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('shop_items')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setItems((data || []).map(item => ({
+        ...item,
+        rarity: item.rarity as 'common' | 'rare' | 'epic' | 'legendary'
+      })));
+    } catch (error) {
+      console.error('Error fetching items:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load items",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
   const [newItem, setNewItem] = useState<Partial<ShopItem>>({
     name: '',
@@ -106,7 +98,7 @@ const ItemManagement = () => {
     type: '',
     price: 0,
     description: '',
-    imageUrl: '',
+      image_url: '',
     rarity: 'common',
     stock: 0,
     effects: [],
@@ -116,7 +108,7 @@ const ItemManagement = () => {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterRarity, setFilterRarity] = useState<string>('all');
 
-  const handleAddItem = () => {
+  const handleAddItem = async () => {
     if (!newItem.name || !newItem.category || !newItem.type || !newItem.price) {
       toast({
         title: "Error",
@@ -126,53 +118,113 @@ const ItemManagement = () => {
       return;
     }
 
-    const item: ShopItem = {
-      id: Date.now(),
-      name: newItem.name!,
-      category: newItem.category!,
-      type: newItem.type!,
-      price: newItem.price!,
-      description: newItem.description || '',
-      imageUrl: newItem.imageUrl || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400',
-      rarity: newItem.rarity as any,
-      stock: newItem.stock || 0,
-      effects: newItem.effects || [],
-      requirements: newItem.requirements || [],
-      createdAt: new Date()
-    };
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to add items",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    setItems([...items, item]);
-    setNewItem({
-      name: '',
-      category: '',
-      type: '',
-      price: 0,
-      description: '',
-      imageUrl: '',
-      rarity: 'common',
-      stock: 0,
-      effects: [],
-      requirements: []
-    });
-    
-    toast({
-      title: "Item Added",
-      description: `${item.name} has been added to the shop`,
-    });
+      const { data, error } = await supabase
+        .from('shop_items')
+        .insert({
+          name: newItem.name!,
+          category: newItem.category!,
+          type: newItem.type!,
+          price: newItem.price!,
+          description: newItem.description || '',
+          image_url: newItem.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400',
+          rarity: newItem.rarity as any,
+          stock: newItem.stock || 0,
+          effects: newItem.effects || [],
+          requirements: newItem.requirements || [],
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const typedItem = {
+        ...data,
+        rarity: data.rarity as 'common' | 'rare' | 'epic' | 'legendary'
+      };
+      setItems([typedItem, ...items]);
+      setNewItem({
+        name: '',
+        category: '',
+        type: '',
+        price: 0,
+        description: '',
+        image_url: '',
+        rarity: 'common',
+        stock: 0,
+        effects: [],
+        requirements: []
+      });
+      
+      toast({
+        title: "Item Added",
+        description: `${data.name} has been added to the shop`,
+      });
+    } catch (error) {
+      console.error('Error adding item:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add item",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteItem = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
-    toast({
-      title: "Item Removed",
-      description: "Item has been removed from the shop",
-    });
+  const handleDeleteItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('shop_items')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setItems(items.filter(item => item.id !== id));
+      toast({
+        title: "Item Removed",
+        description: "Item has been removed from the shop",
+      });
+    } catch (error) {
+      console.error('Error removing item:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove item",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateStock = (id: number, newStock: number) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, stock: newStock } : item
-    ));
+  const handleUpdateStock = async (id: string, newStock: number) => {
+    try {
+      const { error } = await supabase
+        .from('shop_items')
+        .update({ stock: newStock })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setItems(items.map(item => 
+        item.id === id ? { ...item, stock: newStock } : item
+      ));
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update stock",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredItems = items.filter(item => {
@@ -184,6 +236,14 @@ const ItemManagement = () => {
   const getAvailableTypes = (category: string) => {
     return ITEM_TYPES[category as keyof typeof ITEM_TYPES] || [];
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-white font-rajdhani">Loading items...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -264,8 +324,8 @@ const ItemManagement = () => {
             />
             <Input
               placeholder="Image URL"
-              value={newItem.imageUrl || ''}
-              onChange={(e) => setNewItem({ ...newItem, imageUrl: e.target.value })}
+              value={newItem.image_url || ''}
+              onChange={(e) => setNewItem({ ...newItem, image_url: e.target.value })}
               className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
             />
           </div>
@@ -334,7 +394,7 @@ const ItemManagement = () => {
               <div key={item.id} className="bg-gaming-dark/50 rounded-lg border border-gaming-gray/50 overflow-hidden">
                 <div className="aspect-square relative">
                   <img 
-                    src={item.imageUrl} 
+                    src={item.image_url || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400'} 
                     alt={item.name}
                     className="w-full h-full object-cover"
                   />

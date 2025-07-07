@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,38 +6,25 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Car, Plus, Edit, Trash2, Upload } from 'lucide-react';
+import { Car, Plus, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-interface CarModel {
-  id: number;
+interface CarData {
+  id: string;
   name: string;
-  brand: string;
-  category: string;
-  price: number;
-  description: string;
-  imageUrl: string;
-  specifications: {
-    engine: string;
-    horsepower: number;
-    topSpeed: number;
-    acceleration: string;
-  };
-  status: 'available' | 'limited' | 'sold_out';
-  createdAt: Date;
+  make: string;
+  model: string;
+  year?: number;
+  color?: string;
+  license_plate?: string;
+  image_url?: string;
+  owner_name?: string;
+  status: 'available' | 'in_use' | 'maintenance';
+  created_at?: string;
+  updated_at?: string;
 }
 
-const CAR_CATEGORIES = [
-  'Sports Car',
-  'Luxury',
-  'SUV',
-  'Truck',
-  'Motorcycle',
-  'Electric',
-  'Classic',
-  'Tuner'
-];
-
-const CAR_BRANDS = [
+const CAR_MAKES = [
   'BMW',
   'Mercedes',
   'Audi',
@@ -49,155 +36,206 @@ const CAR_BRANDS = [
   'Ford',
   'Chevrolet',
   'Nissan',
-  'McLaren'
+  'McLaren',
+  'Tesla'
 ];
 
 const CarManagement = () => {
   const { toast } = useToast();
+  const [cars, setCars] = useState<CarData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [cars, setCars] = useState<CarModel[]>([
-    {
-      id: 1,
-      name: 'M4 Competition',
-      brand: 'BMW',
-      category: 'Sports Car',
-      price: 75000,
-      description: 'High-performance sports coupe with twin-turbo engine',
-      imageUrl: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400',
-      specifications: {
-        engine: 'Twin-Turbo V6',
-        horsepower: 503,
-        topSpeed: 250,
-        acceleration: '0-60 in 3.8s'
-      },
-      status: 'available',
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      id: 2,
-      name: 'Huracan Evo',
-      brand: 'Lamborghini',
-      category: 'Sports Car',
-      price: 208000,
-      description: 'Iconic Italian supercar with naturally aspirated V10',
-      imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400',
-      specifications: {
-        engine: 'V10 Naturally Aspirated',
-        horsepower: 630,
-        topSpeed: 325,
-        acceleration: '0-60 in 2.9s'
-      },
-      status: 'limited',
-      createdAt: new Date('2024-01-10')
-    },
-    {
-      id: 3,
-      name: 'Model S Plaid',
-      brand: 'Tesla',
-      category: 'Electric',
-      price: 135000,
-      description: 'Ultra-high performance electric sedan',
-      imageUrl: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400',
-      specifications: {
-        engine: 'Triple Motor Electric',
-        horsepower: 1020,
-        topSpeed: 320,
-        acceleration: '0-60 in 1.9s'
-      },
-      status: 'available',
-      createdAt: new Date('2024-01-05')
-    }
-  ]);
+  // Load cars from database
+  useEffect(() => {
+    fetchCars();
+  }, []);
 
-  const [newCar, setNewCar] = useState<Partial<CarModel>>({
-    name: '',
-    brand: '',
-    category: '',
-    price: 0,
-    description: '',
-    imageUrl: '',
-    specifications: {
-      engine: '',
-      horsepower: 0,
-      topSpeed: 0,
-      acceleration: ''
-    },
-    status: 'available'
-  });
+  const fetchCars = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
-  const [editingCar, setEditingCar] = useState<number | null>(null);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterBrand, setFilterBrand] = useState<string>('all');
+      const { data, error } = await supabase
+        .from('cars')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-  const handleAddCar = () => {
-    if (!newCar.name || !newCar.brand || !newCar.category || !newCar.price) {
+      if (error) throw error;
+      setCars((data || []).map(car => ({
+        ...car,
+        status: car.status as 'available' | 'in_use' | 'maintenance'
+      })));
+    } catch (error) {
+      console.error('Error fetching cars:', error);
       toast({
         title: "Error",
-        description: "Please fill in all required fields",
+        description: "Failed to load cars",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [newCar, setNewCar] = useState({
+    name: '',
+    make: '',
+    model: '',
+    year: new Date().getFullYear(),
+    color: '',
+    license_plate: '',
+    image_url: '',
+    owner_name: '',
+    status: 'available' as 'available' | 'in_use' | 'maintenance'
+  });
+
+  const [filterMake, setFilterMake] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  const handleAddCar = async () => {
+    if (!newCar.name || !newCar.make || !newCar.model) {
+      toast({
+        title: "Error",
+        description: "Please fill in name, make, and model",
         variant: "destructive",
       });
       return;
     }
 
-    const car: CarModel = {
-      id: Date.now(),
-      name: newCar.name!,
-      brand: newCar.brand!,
-      category: newCar.category!,
-      price: newCar.price!,
-      description: newCar.description || '',
-      imageUrl: newCar.imageUrl || 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400',
-      specifications: newCar.specifications!,
-      status: newCar.status as 'available' | 'limited' | 'sold_out',
-      createdAt: new Date()
-    };
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to add cars",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    setCars([...cars, car]);
-    setNewCar({
-      name: '',
-      brand: '',
-      category: '',
-      price: 0,
-      description: '',
-      imageUrl: '',
-      specifications: { engine: '', horsepower: 0, topSpeed: 0, acceleration: '' },
-      status: 'available'
-    });
-    
-    toast({
-      title: "Car Added",
-      description: `${car.name} has been added to the inventory`,
-    });
+      const { data, error } = await supabase
+        .from('cars')
+        .insert({
+          name: newCar.name,
+          make: newCar.make,
+          model: newCar.model,
+          year: newCar.year,
+          color: newCar.color,
+          license_plate: newCar.license_plate,
+          image_url: newCar.image_url || 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500',
+          owner_name: newCar.owner_name,
+          status: newCar.status,
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const typedCar = {
+        ...data,
+        status: data.status as 'available' | 'in_use' | 'maintenance'
+      };
+      setCars([typedCar, ...cars]);
+      setNewCar({
+        name: '',
+        make: '',
+        model: '',
+        year: new Date().getFullYear(),
+        color: '',
+        license_plate: '',
+        image_url: '',
+        owner_name: '',
+        status: 'available'
+      });
+      
+      toast({
+        title: "Car Added",
+        description: `${data.name} has been added to the fleet`,
+      });
+    } catch (error) {
+      console.error('Error adding car:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add car",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteCar = (id: number) => {
-    setCars(cars.filter(car => car.id !== id));
-    toast({
-      title: "Car Removed",
-      description: "Car has been removed from inventory",
-    });
+  const handleDeleteCar = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('cars')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setCars(cars.filter(car => car.id !== id));
+      toast({
+        title: "Car Removed",
+        description: "Car has been removed from the fleet",
+      });
+    } catch (error) {
+      console.error('Error removing car:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove car",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateStatus = (id: number, status: 'available' | 'limited' | 'sold_out') => {
-    setCars(cars.map(car => 
-      car.id === id ? { ...car, status } : car
-    ));
+  const handleStatusChange = async (id: string, newStatus: 'available' | 'in_use' | 'maintenance') => {
+    try {
+      const { error } = await supabase
+        .from('cars')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setCars(cars.map(car => 
+        car.id === id ? { ...car, status: newStatus } : car
+      ));
+      toast({
+        title: "Status Updated",
+        description: "Car status has been updated",
+      });
+    } catch (error) {
+      console.error('Error updating car status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update car status",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredCars = cars.filter(car => {
-    const categoryMatch = filterCategory === 'all' || car.category === filterCategory;
-    const brandMatch = filterBrand === 'all' || car.brand === filterBrand;
-    return categoryMatch && brandMatch;
+    const makeMatch = filterMake === 'all' || car.make === filterMake;
+    const statusMatch = filterStatus === 'all' || car.status === filterStatus;
+    return makeMatch && statusMatch;
   });
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available': return 'bg-green-500 text-white';
-      case 'limited': return 'bg-yellow-500 text-white';
-      case 'sold_out': return 'bg-red-500 text-white';
+      case 'in_use': return 'bg-blue-500 text-white';
+      case 'maintenance': return 'bg-red-500 text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-white font-rajdhani">Loading cars...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -212,113 +250,77 @@ const CarManagement = () => {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Input
-              placeholder="Car Name"
-              value={newCar.name || ''}
+              placeholder="Car Name *"
+              value={newCar.name}
               onChange={(e) => setNewCar({ ...newCar, name: e.target.value })}
               className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
             />
-            <Select value={newCar.brand || ''} onValueChange={(value) => setNewCar({ ...newCar, brand: value })}>
+            <Select value={newCar.make} onValueChange={(value) => setNewCar({ ...newCar, make: value })}>
               <SelectTrigger className="bg-gaming-gray border-gaming-gray text-white">
-                <SelectValue placeholder="Select Brand" />
+                <SelectValue placeholder="Select Make *" />
               </SelectTrigger>
               <SelectContent className="bg-gaming-gray border-gaming-gray">
-                {CAR_BRANDS.map((brand) => (
-                  <SelectItem key={brand} value={brand} className="text-white hover:bg-gaming-dark">
-                    {brand}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={newCar.category || ''} onValueChange={(value) => setNewCar({ ...newCar, category: value })}>
-              <SelectTrigger className="bg-gaming-gray border-gaming-gray text-white">
-                <SelectValue placeholder="Select Category" />
-              </SelectTrigger>
-              <SelectContent className="bg-gaming-gray border-gaming-gray">
-                {CAR_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category} className="text-white hover:bg-gaming-dark">
-                    {category}
+                {CAR_MAKES.map((make) => (
+                  <SelectItem key={make} value={make} className="text-white hover:bg-gaming-dark">
+                    {make}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Input
-              placeholder="Price"
+              placeholder="Model *"
+              value={newCar.model}
+              onChange={(e) => setNewCar({ ...newCar, model: e.target.value })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
+            <Input
+              placeholder="Year"
               type="number"
-              value={newCar.price || ''}
-              onChange={(e) => setNewCar({ ...newCar, price: parseInt(e.target.value) || 0 })}
+              value={newCar.year}
+              onChange={(e) => setNewCar({ ...newCar, year: parseInt(e.target.value) || new Date().getFullYear() })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
+            <Input
+              placeholder="Color"
+              value={newCar.color}
+              onChange={(e) => setNewCar({ ...newCar, color: e.target.value })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
+            <Input
+              placeholder="License Plate"
+              value={newCar.license_plate}
+              onChange={(e) => setNewCar({ ...newCar, license_plate: e.target.value })}
+              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
+            />
+            <Input
+              placeholder="Owner Name"
+              value={newCar.owner_name}
+              onChange={(e) => setNewCar({ ...newCar, owner_name: e.target.value })}
               className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
             />
             <Input
               placeholder="Image URL"
-              value={newCar.imageUrl || ''}
-              onChange={(e) => setNewCar({ ...newCar, imageUrl: e.target.value })}
+              value={newCar.image_url}
+              onChange={(e) => setNewCar({ ...newCar, image_url: e.target.value })}
               className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
             />
-            <Select value={newCar.status || 'available'} onValueChange={(value) => setNewCar({ ...newCar, status: value as any })}>
+            <Select value={newCar.status} onValueChange={(value) => setNewCar({ ...newCar, status: value as any })}>
               <SelectTrigger className="bg-gaming-gray border-gaming-gray text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-gaming-gray border-gaming-gray">
                 <SelectItem value="available" className="text-white hover:bg-gaming-dark">Available</SelectItem>
-                <SelectItem value="limited" className="text-white hover:bg-gaming-dark">Limited</SelectItem>
-                <SelectItem value="sold_out" className="text-white hover:bg-gaming-dark">Sold Out</SelectItem>
+                <SelectItem value="in_use" className="text-white hover:bg-gaming-dark">In Use</SelectItem>
+                <SelectItem value="maintenance" className="text-white hover:bg-gaming-dark">Maintenance</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          
-          <Textarea
-            placeholder="Car Description"
-            value={newCar.description || ''}
-            onChange={(e) => setNewCar({ ...newCar, description: e.target.value })}
-            className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Input
-              placeholder="Engine Type"
-              value={newCar.specifications?.engine || ''}
-              onChange={(e) => setNewCar({ 
-                ...newCar, 
-                specifications: { ...newCar.specifications!, engine: e.target.value }
-              })}
-              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-            />
-            <Input
-              placeholder="Horsepower"
-              type="number"
-              value={newCar.specifications?.horsepower || ''}
-              onChange={(e) => setNewCar({ 
-                ...newCar, 
-                specifications: { ...newCar.specifications!, horsepower: parseInt(e.target.value) || 0 }
-              })}
-              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-            />
-            <Input
-              placeholder="Top Speed (km/h)"
-              type="number"
-              value={newCar.specifications?.topSpeed || ''}
-              onChange={(e) => setNewCar({ 
-                ...newCar, 
-                specifications: { ...newCar.specifications!, topSpeed: parseInt(e.target.value) || 0 }
-              })}
-              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-            />
-            <Input
-              placeholder="0-60 Acceleration"
-              value={newCar.specifications?.acceleration || ''}
-              onChange={(e) => setNewCar({ 
-                ...newCar, 
-                specifications: { ...newCar.specifications!, acceleration: e.target.value }
-              })}
-              className="bg-gaming-gray border-gaming-gray text-white placeholder:text-gray-400"
-            />
           </div>
           
           <Button 
             onClick={handleAddCar}
             className="bg-neon-red hover:bg-red-600 text-white border-0 font-rajdhani font-semibold"
           >
-            Add Car to Inventory
+            Add Car to Fleet
           </Button>
         </CardContent>
       </Card>
@@ -328,51 +330,49 @@ const CarManagement = () => {
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-4 items-center">
             <span className="text-gray-300 font-rajdhani">Filter by:</span>
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
+            <Select value={filterMake} onValueChange={setFilterMake}>
               <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-gaming-gray border-gaming-gray">
-                <SelectItem value="all" className="text-white hover:bg-gaming-dark">All Categories</SelectItem>
-                {CAR_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category} className="text-white hover:bg-gaming-dark">
-                    {category}
+                <SelectItem value="all" className="text-white hover:bg-gaming-dark">All Makes</SelectItem>
+                {CAR_MAKES.map((make) => (
+                  <SelectItem key={make} value={make} className="text-white hover:bg-gaming-dark">
+                    {make}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Select value={filterBrand} onValueChange={setFilterBrand}>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-48 bg-gaming-gray border-gaming-gray text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-gaming-gray border-gaming-gray">
-                <SelectItem value="all" className="text-white hover:bg-gaming-dark">All Brands</SelectItem>
-                {CAR_BRANDS.map((brand) => (
-                  <SelectItem key={brand} value={brand} className="text-white hover:bg-gaming-dark">
-                    {brand}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all" className="text-white hover:bg-gaming-dark">All Status</SelectItem>
+                <SelectItem value="available" className="text-white hover:bg-gaming-dark">Available</SelectItem>
+                <SelectItem value="in_use" className="text-white hover:bg-gaming-dark">In Use</SelectItem>
+                <SelectItem value="maintenance" className="text-white hover:bg-gaming-dark">Maintenance</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Car Inventory */}
+      {/* Car Fleet */}
       <Card className="gaming-card border border-gaming-gray">
         <CardHeader>
           <h3 className="font-orbitron text-lg font-bold text-white flex items-center gap-2">
             <Car className="w-5 h-5" />
-            Car Inventory ({filteredCars.length})
+            Car Fleet ({filteredCars.length})
           </h3>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCars.map((car) => (
               <div key={car.id} className="bg-gaming-dark/50 rounded-lg border border-gaming-gray/50 overflow-hidden">
-                <div className="aspect-video relative">
+                <div className="aspect-video relative overflow-hidden rounded-t-lg">
                   <img 
-                    src={car.imageUrl} 
+                    src={car.image_url || 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'} 
                     alt={car.name}
                     className="w-full h-full object-cover"
                   />
@@ -385,36 +385,54 @@ const CarManagement = () => {
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-orbitron text-white font-semibold">{car.name}</h4>
                     <Badge variant="outline" className="text-neon-red border-neon-red">
-                      {car.brand}
+                      {car.make}
                     </Badge>
                   </div>
                   
-                  <p className="text-gray-300 text-sm mb-3">{car.description}</p>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Price:</span>
-                      <span className="text-neon-red font-semibold">${car.price.toLocaleString()}</span>
+                  <div className="space-y-2 text-sm mb-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Model:</span>
+                      <span className="text-white">{car.model}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Power:</span>
-                      <span className="text-white">{car.specifications.horsepower} HP</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Top Speed:</span>
-                      <span className="text-white">{car.specifications.topSpeed} km/h</span>
+                    {car.year && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Year:</span>
+                        <span className="text-white">{car.year}</span>
+                      </div>
+                    )}
+                    {car.color && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Color:</span>
+                        <span className="text-white">{car.color}</span>
+                      </div>
+                    )}
+                    {car.license_plate && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">License:</span>
+                        <span className="text-white">{car.license_plate}</span>
+                      </div>
+                    )}
+                    {car.owner_name && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Owner:</span>
+                        <span className="text-white">{car.owner_name}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Created:</span>
+                      <span className="text-white">{car.created_at ? new Date(car.created_at).toLocaleDateString() : 'N/A'}</span>
                     </div>
                   </div>
                   
                   <div className="flex gap-2">
-                    <Select value={car.status} onValueChange={(value) => handleUpdateStatus(car.id, value as any)}>
+                    <Select value={car.status} onValueChange={(value) => handleStatusChange(car.id, value as any)}>
                       <SelectTrigger className="flex-1 bg-gaming-gray border-gaming-gray text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-gaming-gray border-gaming-gray">
                         <SelectItem value="available" className="text-white hover:bg-gaming-dark">Available</SelectItem>
-                        <SelectItem value="limited" className="text-white hover:bg-gaming-dark">Limited</SelectItem>
-                        <SelectItem value="sold_out" className="text-white hover:bg-gaming-dark">Sold Out</SelectItem>
+                        <SelectItem value="in_use" className="text-white hover:bg-gaming-dark">In Use</SelectItem>
+                        <SelectItem value="maintenance" className="text-white hover:bg-gaming-dark">Maintenance</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button 
