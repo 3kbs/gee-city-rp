@@ -59,15 +59,38 @@ const products = [
 
 const Shop = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gaming-dark relative">
+      {/* Background gradient overlay */}
+      <div className="fixed inset-0 bg-gradient-to-br from-gaming-dark via-gaming-gray to-gaming-dark opacity-90 pointer-events-none"></div>
+      
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-neon-red rounded-full animate-float opacity-40"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header className="relative z-50 border-b border-gaming-gray bg-gaming-dark/95 backdrop-blur sticky top-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <h1 className="font-orbitron text-2xl font-bold text-foreground">GEE City Store</h1>
+              <h1 className="font-orbitron text-2xl font-bold text-white neon-glow">GEE City Store</h1>
             </div>
-            <Button variant="outline" onClick={() => window.history.back()}>
+            <Button 
+              variant="outline" 
+              onClick={() => window.history.back()}
+              className="border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300"
+            >
               Back to Main
             </Button>
           </div>
@@ -75,38 +98,42 @@ const Shop = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-to-b from-muted/50 to-background">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="font-orbitron text-5xl md:text-6xl font-black text-foreground mb-6">
+      <section className="relative py-20 px-4 bg-gradient-to-b from-gaming-dark/80 to-gaming-gray/50">
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          <h1 className="font-orbitron text-5xl md:text-6xl font-black text-white mb-6 animate-glow-pulse">
             GEE City Store
+            <span className="text-neon-red"> 🛒</span>
           </h1>
-          <p className="font-rajdhani text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="font-rajdhani text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Discover premium content, exclusive items, and unlock the full potential of your GEE City experience.
           </p>
-          <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-gradient-to-r from-neon-red to-red-400 mx-auto rounded-full animate-glow-pulse"></div>
         </div>
       </section>
 
       {/* Featured Product */}
-      <section className="py-16 px-4">
+      <section className="relative py-16 px-4 z-10">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-3xl p-8 md:p-12 mb-16">
+          <div className="gaming-card bg-gradient-to-r from-neon-red/20 via-gaming-gray to-neon-red/10 p-8 md:p-12 mb-16 border border-neon-red/30">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <Badge className="mb-4 bg-primary text-primary-foreground">Featured</Badge>
-                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-foreground mb-4">
+                <Badge className="mb-4 bg-neon-red text-white animate-glow-pulse">Featured</Badge>
+                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white mb-4 neon-glow">
                   GEE City Premium Pass
                 </h2>
-                <p className="text-muted-foreground text-lg mb-6">
+                <p className="text-gray-300 text-lg mb-6 font-rajdhani">
                   The ultimate GEE City experience with exclusive access to premium features, 
                   custom content, and VIP support.
                 </p>
                 <div className="flex items-center space-x-4 mb-6">
-                  <span className="font-orbitron text-3xl font-bold text-foreground">€19.99</span>
-                  <span className="text-muted-foreground line-through text-xl">€29.99</span>
-                  <Badge variant="secondary">33% Off</Badge>
+                  <span className="font-orbitron text-3xl font-bold text-neon-red animate-glow-pulse">€19.99</span>
+                  <span className="text-gray-400 line-through text-xl">€29.99</span>
+                  <Badge variant="secondary" className="bg-dark-red text-white">33% Off</Badge>
                 </div>
-                <Button size="lg" className="font-rajdhani font-semibold">
+                <Button 
+                  size="lg" 
+                  className="font-rajdhani font-semibold bg-neon-red hover:bg-red-600 text-white border-0 shadow-lg hover:shadow-neon-red/50 transition-all duration-300 transform hover:scale-105"
+                >
                   Get Premium Pass
                 </Button>
               </div>
@@ -114,8 +141,9 @@ const Shop = () => {
                 <img 
                   src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=600&fit=crop" 
                   alt="Premium Pass"
-                  className="rounded-2xl shadow-2xl w-full h-80 object-cover"
+                  className="rounded-2xl shadow-2xl w-full h-80 object-cover border border-neon-red/30"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-neon-red/20 to-transparent rounded-2xl"></div>
               </div>
             </div>
           </div>
@@ -123,20 +151,21 @@ const Shop = () => {
       </section>
 
       {/* Products Grid */}
-      <section className="py-16 px-4">
+      <section className="relative py-16 px-4 z-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white mb-4 neon-glow">
               All Products
             </h2>
-            <p className="font-rajdhani text-lg text-muted-foreground">
+            <p className="font-rajdhani text-lg text-gray-300">
               Choose from our selection of premium content and features
             </p>
+            <div className="w-24 h-1 bg-gradient-to-r from-neon-red to-red-400 mx-auto rounded-full mt-6"></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <Card key={product.id} className="group hover:shadow-lg transition-all duration-300 border-0 bg-card/50 backdrop-blur">
+              <Card key={product.id} className="gaming-card group hover:scale-105 transition-all duration-300 border border-gaming-gray hover:border-neon-red bg-gaming-gray/50 backdrop-blur">
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <img 
@@ -144,8 +173,9 @@ const Shop = () => {
                       alt={product.name}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gaming-dark/60 to-transparent"></div>
                     {product.badge && (
-                      <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">
+                      <Badge className="absolute top-3 left-3 bg-neon-red text-white animate-glow-pulse">
                         {product.badge}
                       </Badge>
                     )}
@@ -153,35 +183,40 @@ const Shop = () => {
                   
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs bg-gaming-gray border border-neon-red/30 text-gray-300">
                         {product.category}
                       </Badge>
                     </div>
                     
-                    <h3 className="font-orbitron font-bold text-foreground mb-2">
+                    <h3 className="font-orbitron font-bold text-white mb-2 group-hover:text-neon-red transition-colors duration-300">
                       {product.name}
                     </h3>
                     
-                    <p className="text-muted-foreground text-sm mb-4">
+                    <p className="text-gray-300 text-sm mb-4 font-rajdhani">
                       {product.description}
                     </p>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="font-orbitron font-bold text-foreground text-lg">
+                        <span className="font-orbitron font-bold text-neon-red text-lg">
                           {product.price}
                         </span>
                         {product.originalPrice && (
-                          <span className="text-muted-foreground line-through text-sm">
+                          <span className="text-gray-400 line-through text-sm">
                             {product.originalPrice}
                           </span>
                         )}
                       </div>
                       
-                      <Button size="sm" className="font-rajdhani">
+                      <Button 
+                        size="sm" 
+                        className="font-rajdhani bg-neon-red hover:bg-red-600 text-white border-0 transition-all duration-300 hover:shadow-neon-red/50"
+                      >
                         Buy Now
                       </Button>
                     </div>
+
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-neon-red to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                 </CardContent>
               </Card>
@@ -191,19 +226,27 @@ const Shop = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="relative py-20 px-4 bg-gradient-to-b from-gaming-gray/30 to-gaming-dark/50 z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-foreground mb-6">
+          <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white mb-6 neon-glow">
             Ready to enhance your experience?
+            <span className="text-neon-red"> ⚡</span>
           </h2>
-          <p className="font-rajdhani text-lg text-muted-foreground mb-8">
+          <p className="font-rajdhani text-lg text-gray-300 mb-8">
             Join thousands of players who have upgraded their GEE City adventure
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="font-rajdhani font-semibold">
+            <Button 
+              size="lg" 
+              className="font-rajdhani font-semibold bg-neon-red hover:bg-red-600 text-white border-0 shadow-lg hover:shadow-neon-red/50 transition-all duration-300 transform hover:scale-105"
+            >
               Browse All Products
             </Button>
-            <Button variant="outline" size="lg" className="font-rajdhani font-semibold">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="font-rajdhani font-semibold border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300 transform hover:scale-105"
+            >
               Contact Support
             </Button>
           </div>
