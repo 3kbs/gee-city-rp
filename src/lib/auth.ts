@@ -1,6 +1,5 @@
-// Enhanced auth service with cookie persistence
-// Replace with proper Supabase integration when available
-import Cookies from 'js-cookie';
+// Auth service that uses real Supabase authentication
+import { supabase as realSupabase } from '@/integrations/supabase/client';
 
 export interface User {
   id: string;
@@ -12,78 +11,54 @@ export interface AuthSession {
   access_token: string;
 }
 
-// Demo admin credentials - will be replaced with proper Supabase auth
+// Demo admin credentials for easy login
 const DEMO_ADMIN_EMAIL = 'admin@geecity.com';
 const DEMO_ADMIN_PASSWORD = 'GWQIFTZWTCW124124!"§!"§';
 
 class AuthService {
-  private cookieKey = 'gee_city_auth_session';
-  private cookieOptions = {
-    expires: 7, // 7 days
-    secure: window.location.protocol === 'https:',
-    sameSite: 'strict' as const
-  };
-
   async signInWithPassword(credentials: { email: string; password: string }) {
-    // Demo authentication - replace with real Supabase calls
+    // If using demo credentials, create a real Supabase user or sign in
     if (credentials.email === DEMO_ADMIN_EMAIL && credentials.password === DEMO_ADMIN_PASSWORD) {
-      const session: AuthSession = {
-        user: {
-          id: '1',
-          email: credentials.email,
-        },
-        access_token: 'demo_token_' + Date.now(),
-      };
+      // Try to sign in with Supabase
+      const { data, error } = await realSupabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
       
-      Cookies.set(this.cookieKey, JSON.stringify(session), this.cookieOptions);
-      return { data: { session }, error: null };
+      if (error && error.message.includes('Invalid login credentials')) {
+        // User doesn't exist, try to sign up
+        const { data: signUpData, error: signUpError } = await realSupabase.auth.signUp({
+          email: credentials.email,
+          password: credentials.password,
+        });
+        
+        if (signUpError) {
+          return { data: { session: null }, error: signUpError };
+        }
+        
+        return { data: signUpData, error: null };
+      }
+      
+      return { data, error };
     } else {
       return { data: { session: null }, error: { message: 'Invalid credentials' } };
     }
   }
 
   async getSession() {
-    const stored = Cookies.get(this.cookieKey);
-    if (stored) {
-      try {
-        const session = JSON.parse(stored);
-        return { data: { session }, error: null };
-      } catch {
-        Cookies.remove(this.cookieKey);
-      }
-    }
-    return { data: { session: null }, error: null };
+    return await realSupabase.auth.getSession();
   }
 
   async getUser() {
-    const { data } = await this.getSession();
-    return { data: { user: data.session?.user || null }, error: null };
+    return await realSupabase.auth.getUser();
   }
 
   async signOut() {
-    Cookies.remove(this.cookieKey);
-    return { error: null };
+    return await realSupabase.auth.signOut();
   }
 
-  onAuthStateChange(callback: (event: string, session: AuthSession | null) => void) {
-    // Simple implementation for demo - in real Supabase this would be more sophisticated
-    const checkSession = async () => {
-      const { data } = await this.getSession();
-      callback('SIGNED_IN', data.session);
-    };
-    
-    checkSession();
-    
-    // Return subscription-like object
-    return {
-      data: {
-        subscription: {
-          unsubscribe: () => {
-            // Cleanup would go here
-          }
-        }
-      }
-    };
+  onAuthStateChange(callback: (event: string, session: any) => void) {
+    return realSupabase.auth.onAuthStateChange(callback);
   }
 }
 

@@ -8,7 +8,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { Users, UserPlus, Settings, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { supabase as authService } from '@/lib/auth';
 
 interface TeamMember {
   id: string;
@@ -78,7 +77,7 @@ const TeamManagement = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      const { data: { user } } = await authService.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data, error } = await supabase
@@ -115,7 +114,7 @@ const TeamManagement = () => {
     }
 
     try {
-      const { data: { user } } = await authService.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
           title: "Error",
