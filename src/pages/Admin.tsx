@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/auth';
+import { useNavigate } from 'react-router-dom';
 
 interface Task {
   id: number;
@@ -41,6 +43,8 @@ const statusConfig = {
 
 const Admin = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState<string>('');
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
@@ -102,6 +106,33 @@ const Admin = () => {
 
   const [newReply, setNewReply] = useState<{[key: number]: string}>({});
   const [sortBy, setSortBy] = useState<'priority' | 'date' | 'status'>('priority');
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email || '');
+      }
+    };
+    getUser();
+  }, []);
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to logout",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out",
+      });
+      navigate('/login');
+    }
+  };
 
   const handleCreateTask = () => {
     if (!newTask.title.trim()) {
@@ -190,14 +221,25 @@ const Admin = () => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <h1 className="font-orbitron text-2xl font-bold text-white neon-glow">Admin Dashboard</h1>
+              <span className="text-gray-400 font-rajdhani">|</span>
+              <span className="text-neon-red font-rajdhani">{userEmail}</span>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => window.history.back()}
-              className="border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300"
-            >
-              Back to Main
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-all duration-300"
+              >
+                Logout
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/')}
+                className="border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300"
+              >
+                Back to Main
+              </Button>
+            </div>
           </div>
         </div>
       </header>

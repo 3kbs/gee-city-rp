@@ -1,12 +1,31 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/auth';
 
 const HeroSection = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setIsAuthenticated(!!session);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleJoinClick = () => {
     // Open Discord invite in new tab
@@ -87,10 +106,10 @@ const HeroSection = () => {
             <Button 
               variant="outline" 
               size="lg"
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate(isAuthenticated ? '/admin' : '/login')}
               className="font-rajdhani font-semibold text-lg px-8 py-4 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition-all duration-300 transform hover:scale-105"
             >
-              ⚙️ ADMIN
+              ⚙️ {isAuthenticated ? 'ADMIN' : 'LOGIN'}
             </Button>
 
             <Button 
