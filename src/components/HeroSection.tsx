@@ -2,11 +2,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleJoinClick = () => {
     // Open Discord invite in new tab
@@ -23,10 +21,6 @@ const HeroSection = () => {
     if (highlightsSection) {
       highlightsSection.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const handleMinigameClick = () => {
-    navigate('/minigame');
   };
 
   return (
@@ -73,15 +67,6 @@ const HeroSection = () => {
               className="font-rajdhani font-semibold text-lg px-8 py-4 border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300 transform hover:scale-105"
             >
               📖 MEHR ERFAHREN
-            </Button>
-
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={handleMinigameClick}
-              className="font-rajdhani font-semibold text-lg px-8 py-4 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition-all duration-300 transform hover:scale-105"
-            >
-              🎮 MINIGAME
             </Button>
           </div>
         </div>
