@@ -1,7 +1,17 @@
 
 import React from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const Footer = () => {
+  const { toast } = useToast();
+
+  const handleLegalClick = (type: 'impressum' | 'datenschutz') => {
+    toast({
+      title: type === 'impressum' ? 'Impressum' : 'Datenschutz',
+      description: `${type === 'impressum' ? 'Impressum' : 'Datenschutzerklärung'} wird in Kürze verfügbar sein.`,
+    });
+  };
+
   return (
     <footer className="relative border-t border-gray-800 py-12 px-4 z-10">
       <div className="max-w-6xl mx-auto">
@@ -16,12 +26,18 @@ const Footer = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="flex space-x-6 text-gray-400 font-rajdhani">
-            <a href="#" className="hover:text-neon-red transition-colors duration-300">
+            <button 
+              onClick={() => handleLegalClick('impressum')}
+              className="hover:text-neon-red transition-colors duration-300 cursor-pointer"
+            >
               📄 Impressum
-            </a>
-            <a href="#" className="hover:text-neon-red transition-colors duration-300">
+            </button>
+            <button 
+              onClick={() => handleLegalClick('datenschutz')}
+              className="hover:text-neon-red transition-colors duration-300 cursor-pointer"
+            >
               🔒 Datenschutz
-            </a>
+            </button>
           </div>
 
           <div className="text-gray-500 font-rajdhani text-sm">

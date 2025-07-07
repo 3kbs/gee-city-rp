@@ -1,39 +1,54 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 const socialLinks = [
   {
     name: 'Website',
     icon: '🌐',
-    url: 'www.geecity.com',
+    url: 'https://www.geecity.com',
+    displayUrl: 'www.geecity.com',
     color: 'text-blue-400',
     hoverColor: 'hover:text-blue-300'
   },
   {
     name: 'Discord',
     icon: '📱',
-    url: 'Join our Discord',
+    url: 'https://discord.gg/geecity',
+    displayUrl: 'Join our Discord',
     color: 'text-purple-400',
     hoverColor: 'hover:text-purple-300'
   },
   {
     name: 'Instagram',
     icon: '📸',
-    url: '@GEECity',
+    url: 'https://instagram.com/geecity',
+    displayUrl: '@GEECity',
     color: 'text-pink-400',
     hoverColor: 'hover:text-pink-300'
   },
   {
     name: 'YouTube',
     icon: '🎥',
-    url: 'GEE City',
+    url: 'https://youtube.com/@geecity',
+    displayUrl: 'GEE City',
     color: 'text-red-400',
     hoverColor: 'hover:text-red-300'
   }
 ];
 
 const SocialSection = () => {
+  const { toast } = useToast();
+
+  const handleSocialClick = (link: typeof socialLinks[0]) => {
+    window.open(link.url, '_blank');
+    toast({
+      title: `${link.name} wird geöffnet!`,
+      description: `Du wirst zu ${link.name} weitergeleitet.`,
+    });
+  };
+
   return (
     <section className="relative py-20 px-4 z-10">
       <div className="max-w-4xl mx-auto text-center">
@@ -54,6 +69,7 @@ const SocialSection = () => {
               key={index}
               className="gaming-card group hover:scale-105 transition-all duration-300 cursor-pointer"
               style={{ animationDelay: `${index * 0.1}s` }}
+              onClick={() => handleSocialClick(link)}
             >
               <div className="text-center">
                 <div className="text-4xl mb-4 animate-float">
@@ -63,7 +79,7 @@ const SocialSection = () => {
                   {link.name}
                 </h3>
                 <p className={`font-rajdhani ${link.color} ${link.hoverColor} transition-colors duration-300`}>
-                  {link.url}
+                  {link.displayUrl}
                 </p>
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-neon-red to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

@@ -1,8 +1,28 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 const HeroSection = () => {
+  const { toast } = useToast();
+
+  const handleJoinClick = () => {
+    // Open Discord invite in new tab
+    window.open('https://discord.gg/geecity', '_blank');
+    toast({
+      title: "Discord öffnet sich!",
+      description: "Du wirst zu unserem Discord Server weitergeleitet.",
+    });
+  };
+
+  const handleLearnMoreClick = () => {
+    // Smooth scroll to highlights section
+    const highlightsSection = document.querySelector('#highlights');
+    if (highlightsSection) {
+      highlightsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-radial from-red-900/20 via-transparent to-transparent"></div>
@@ -34,6 +54,7 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
             <Button 
               size="lg" 
+              onClick={handleJoinClick}
               className="font-orbitron font-bold text-lg px-8 py-4 bg-neon-red hover:bg-red-600 text-white border-0 shadow-lg hover:shadow-neon-red/50 transition-all duration-300 transform hover:scale-105 animate-glow-pulse"
             >
               🚀 JETZT BEITRETEN
@@ -42,6 +63,7 @@ const HeroSection = () => {
             <Button 
               variant="outline" 
               size="lg"
+              onClick={handleLearnMoreClick}
               className="font-rajdhani font-semibold text-lg px-8 py-4 border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300 transform hover:scale-105"
             >
               📖 MEHR ERFAHREN
