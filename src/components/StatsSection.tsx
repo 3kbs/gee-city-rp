@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const stats = [
   {
-    number: 500,
+    number: 10,
     suffix: '+',
     label: 'Aktive Spieler',
     description: 'Täglich online',
@@ -16,7 +16,7 @@ const stats = [
     icon: '⚡'
   },
   {
-    number: 50,
+    number: 15,
     suffix: '+',
     label: 'Custom Jobs',
     description: 'Verfügbare Berufe',
