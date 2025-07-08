@@ -67,7 +67,7 @@ const SocialSection = () => {
           {socialLinks.map((link, index) => (
             <div
               key={index}
-              className="gaming-card group hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="glass-card interactive-glow group cursor-pointer p-6 relative"
               style={{ animationDelay: `${index * 0.1}s` }}
               onClick={() => handleSocialClick(link)}
             >
@@ -87,17 +87,20 @@ const SocialSection = () => {
           ))}
         </div>
 
-        <div className="gaming-card bg-gradient-to-r from-gaming-gray via-gaming-dark to-gaming-gray p-8">
-          <h3 className="font-orbitron text-2xl font-bold text-white mb-4">
-            Unser Versprechen an dich ❤️
-          </h3>
-          <p className="font-rajdhani text-lg text-gray-300 mb-6 leading-relaxed">
-            Die Transformation von GEE City ist eine große Herausforderung, 
-            aber wir sind fest entschlossen, den besten Server zu schaffen, den die FiveM-Community je gesehen hat. 
-            Deine Geduld und Unterstützung während dieser Zeit bedeuten uns sehr viel.
-          </p>
-          <div className="text-2xl text-neon-red font-orbitron font-bold neon-glow animate-glow-pulse">
-            🌟 Gemeinsam werden wir GEE City zu einem Vorzeigeprojekt machen! 🌟
+        <div className="glass-card bg-gradient-to-r from-white/5 via-white/10 to-white/5 p-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-neon-red/10 via-transparent to-purple-500/10"></div>
+          <div className="relative z-10">
+            <h3 className="font-orbitron text-2xl font-bold text-white mb-4">
+              Unser Versprechen an dich ❤️
+            </h3>
+            <p className="font-rajdhani text-lg text-gray-300 mb-6 leading-relaxed">
+              Die Transformation von GEE City ist eine große Herausforderung, 
+              aber wir sind fest entschlossen, den besten Server zu schaffen, den die FiveM-Community je gesehen hat. 
+              Deine Geduld und Unterstützung während dieser Zeit bedeuten uns sehr viel.
+            </p>
+            <div className="text-2xl text-neon-red font-orbitron font-bold neon-glow animate-glow-pulse">
+              🌟 Gemeinsam werden wir GEE City zu einem Vorzeigeprojekt machen! 🌟
+            </div>
           </div>
         </div>
       </div>

@@ -62,9 +62,12 @@ const HighlightsSection = () => {
           {highlights.map((highlight, index) => (
             <div
               key={index}
-              className="gaming-card group hover:scale-105 transition-all duration-300"
+              className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl p-6 group hover:scale-105 hover:bg-white/15 transition-all duration-500 shadow-2xl relative overflow-hidden"
               style={{ animationDelay: `${index * 0.2}s` }}
             >
+              {/* Glass overlay effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/5 rounded-2xl"></div>
+              <div className="relative z-10">
               <div className="flex items-center mb-6">
                 <div className="text-4xl mr-4 animate-float">
                   {highlight.icon}
@@ -90,7 +93,8 @@ const HighlightsSection = () => {
                 ))}
               </ul>
 
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-neon-red to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-neon-red to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
             </div>
           ))}
         </div>
