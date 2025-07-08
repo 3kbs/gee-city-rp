@@ -1,31 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/auth';
 
 const HeroSection = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
-    
-    checkAuth();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setIsAuthenticated(!!session);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleJoinClick = () => {
     // Open Discord invite in new tab
@@ -44,9 +23,6 @@ const HeroSection = () => {
     }
   };
 
-  const handleMinigameClick = () => {
-    navigate('/minigame');
-  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
@@ -92,33 +68,6 @@ const HeroSection = () => {
               className="font-rajdhani font-semibold text-lg px-8 py-4 border-neon-red text-neon-red hover:bg-neon-red hover:text-white transition-all duration-300 transform hover:scale-105"
             >
               📖 MEHR ERFAHREN
-            </Button>
-
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => navigate('/shop')}
-              className="font-rajdhani font-semibold text-lg px-8 py-4 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white transition-all duration-300 transform hover:scale-105"
-            >
-              🛒 SHOP
-            </Button>
-
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => navigate(isAuthenticated ? '/admin' : '/login')}
-              className="font-rajdhani font-semibold text-lg px-8 py-4 border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition-all duration-300 transform hover:scale-105"
-            >
-              ⚙️ {isAuthenticated ? 'ADMIN' : 'LOGIN'}
-            </Button>
-
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={handleMinigameClick}
-              className="font-rajdhani font-semibold text-lg px-8 py-4 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-white transition-all duration-300 transform hover:scale-105"
-            >
-              🍪 COOKIE EMPIRE
             </Button>
           </div>
         </div>
