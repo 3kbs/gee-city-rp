@@ -12,7 +12,7 @@ const features = [
   {
     icon: Users,
     title: 'Aktive Community',
-    description: 'Über 500+ aktive Spieler täglich online',
+    description: 'Über 10+ aktive Spieler täglich online',
     color: 'text-green-400',
     bgColor: 'from-green-500/20 to-green-600/10'
   },
