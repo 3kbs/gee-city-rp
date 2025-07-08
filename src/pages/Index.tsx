@@ -6,7 +6,6 @@ import HighlightsSection from '../components/HighlightsSection';
 import StatsSection from '../components/StatsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import GettingStartedSection from '../components/GettingStartedSection';
-import RoadmapSection from '../components/RoadmapSection';
 import SocialSection from '../components/SocialSection';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -22,7 +21,6 @@ const Index = () => {
       <StatsSection />
       <TestimonialsSection />
       <GettingStartedSection />
-      <RoadmapSection />
       <SocialSection />
       <ContactSection />
       <Footer />
