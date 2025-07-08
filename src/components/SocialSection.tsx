@@ -7,8 +7,8 @@ const socialLinks = [
   {
     name: 'Website',
     icon: '🌐',
-    url: 'https://www.geecity.com',
-    displayUrl: 'www.geecity.com',
+    url: 'https://gee-city-rp.com',
+    displayUrl: 'gee-city-rp.com',
     color: 'text-blue-400',
     hoverColor: 'hover:text-blue-300'
   },
@@ -16,23 +16,23 @@ const socialLinks = [
     name: 'Discord',
     icon: '📱',
     url: 'https://discord.gg/geecity',
-    displayUrl: 'Join our Discord',
+    displayUrl: 'Trete unserem Discord bei!',
     color: 'text-purple-400',
     hoverColor: 'hover:text-purple-300'
   },
   {
     name: 'Instagram',
     icon: '📸',
-    url: 'https://instagram.com/geecity',
-    displayUrl: '@GEECity',
+    url: 'https://www.instagram.com/gee_city_official',
+    displayUrl: '@gee_city_official',
     color: 'text-pink-400',
     hoverColor: 'hover:text-pink-300'
   },
   {
     name: 'YouTube',
     icon: '🎥',
-    url: 'https://youtube.com/@geecity',
-    displayUrl: 'GEE City',
+    url: 'https://www.youtube.com/channel/UCl0hWfBbf_9C9ZAZ-SD5sNw',
+    displayUrl: '@Gee_City_Official',
     color: 'text-red-400',
     hoverColor: 'hover:text-red-300'
   }
