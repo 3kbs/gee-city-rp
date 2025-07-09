@@ -14,16 +14,6 @@ const ContactSection = () => {
     });
   };
 
-  const handleEmailClick = () => {
-    window.location.href = 'mailto:support@geecity.com';
-  };
-
-  const handlePhoneClick = () => {
-    toast({
-      title: "Support Hotline",
-      description: "Rufe uns an unter +49 123 456 789 für direkten Support!",
-    });
-  };
 
   return (
     <section className="relative py-20 px-4 z-10">
@@ -46,52 +36,36 @@ const ContactSection = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="gaming-card">
-            <h3 className="font-orbitron text-2xl font-bold text-white mb-6 flex items-center">
-              <span className="text-2xl mr-3">❓</span>
-              Noch Fragen?
-            </h3>
-            <p className="font-rajdhani text-gray-300 text-lg mb-6">
-              Schau in unserem FAQ vorbei oder kontaktiere uns direkt:
-            </p>
-            <div className="space-y-4">
-              <div 
-                className="flex items-center text-gray-400 hover:text-neon-red transition-colors cursor-pointer"
-                onClick={handleEmailClick}
-              >
-                <span className="text-xl mr-3">📧</span>
-                <span className="font-rajdhani">support@geecity.com</span>
-              </div>
-              <div 
-                className="flex items-center text-gray-400 hover:text-neon-red transition-colors cursor-pointer"
-                onClick={handlePhoneClick}
-              >
-                <span className="text-xl mr-3">📞</span>
-                <span className="font-rajdhani">+49 123 456 789</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="gaming-card">
-            <h3 className="font-orbitron text-2xl font-bold text-white mb-6 flex items-center">
-              <span className="text-2xl mr-3">🌟</span>
-              Warum GEE City?
-            </h3>
-            <div className="space-y-4 font-rajdhani text-gray-300">
-              <div className="flex items-start">
-                <span className="text-neon-red mr-3">▶</span>
-                <span><strong>Für Profis:</strong> Realistisches Roleplay und tiefgehende Mechaniken</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-neon-red mr-3">▶</span>
-                <span><strong>Für Einsteiger:</strong> Einfache Zugänge und intuitive Systeme</span>
-              </div>
-              <div className="flex items-start">
-                <span className="text-neon-red mr-3">▶</span>
-                <span><strong>Für alle:</strong> Eine lebendige Welt voller Abenteuer</span>
-              </div>
-            </div>
+        <div className="gaming-card">
+          <h3 className="font-orbitron text-2xl font-bold text-white mb-6 flex items-center">
+            <span className="text-2xl mr-3">📋</span>
+            Server Regelwerk
+          </h3>
+          <p className="font-rajdhani text-gray-300 text-lg mb-8">
+            Informiere dich über alle wichtigen Regeln und Gesetze des Servers:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button 
+              size="lg" 
+              onClick={() => window.open('/staats-regelwerk', '_blank')}
+              className="font-orbitron font-bold px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white border-0 shadow-lg hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105"
+            >
+              📖 Staats Regelwerk
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => window.open('/fraktions-regelwerk', '_blank')}
+              className="font-orbitron font-bold px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white border-0 shadow-lg hover:shadow-purple-500/30 transition-all duration-300 transform hover:scale-105"
+            >
+              👥 Fraktions Regelwerk
+            </Button>
+            <Button 
+              size="lg" 
+              onClick={() => window.open('/staats-gesetz', '_blank')}
+              className="font-orbitron font-bold px-6 py-4 bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 text-white border-0 shadow-lg hover:shadow-green-500/30 transition-all duration-300 transform hover:scale-105"
+            >
+              ⚖️ Staats Gesetz
+            </Button>
           </div>
         </div>
       </div>
