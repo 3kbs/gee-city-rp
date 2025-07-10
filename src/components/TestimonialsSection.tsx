@@ -10,18 +10,18 @@ const testimonials = [
     text: 'Gee City ist ein Top Mid Core Server, mit tollen Spielern und noch besseren Admins. Sie kümmern sich um alles in kürzester Zeit und geben allen ein Familiäres Gefühl. Macht weiter so !!!'
   },
   {
-    name: 'SarahCars',
-    role: 'Mechanikerin',
-    avatar: '👩‍🔧',
+    name: 'Ava',
+    role: 'Tätowiererin',
+    avatar: '🪡',
     rating: 5,
-    text: 'Als Mechanikerin liebe ich die detaillierten Fahrzeug-Systeme. Jede Reparatur fühlt sich realistisch an und macht Spaß!'
+    text: 'Ich bin vor gut 2 Monaten auf den Server als kompletter Anfänger gekommen mit meiner besten Freundin. Schnell haben wir uns wohl gefühlt und es war klar, wir bleiben hier. So familiäres und klasse RP hat uns einfach festgehalten.Es war einfach nie langweilig. Von Anfang an wurden wir begleitet und in die Rp-Welt bestens eingeführt. TOP!'
   },
   {
-    name: 'DoctorHouse',
-    role: 'Mediziner',
-    avatar: '👨‍⚕️',
+    name: 'Linda Hannjo',
+    role: 'Polizistin',
+    avatar: '👮‍♂️',
     rating: 5,
-    text: 'Das Medizin-System ist so durchdacht! Man merkt, dass viel Liebe zum Detail in jeden Aspekt des Servers geflossen ist.'
+    text: 'Als RP-Neuling hätte ich mir keinen besseren Server wünschen können – liebevoll, hilfsbereit und voller Herzblut. Die Community ist großartig, der Einstieg wurde mir leicht gemacht, und ich fühle mich rundum willkommen. Nach zwei Monaten bin ich einfach nur begeistert'
   },
   {
     name: 'BusinessWoman',
