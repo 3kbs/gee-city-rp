@@ -3,11 +3,11 @@ import { Star } from 'lucide-react';
 
 const testimonials = [
   {
-    name: 'Max_Mueller',
-    role: 'Polizist',
-    avatar: '👮‍♂️',
+    name: 'Ilia Topuria',
+    role: 'Sons of Mayhem',
+    avatar: '🏍️',
     rating: 5,
-    text: 'GEE City bietet das beste Roleplay-Erlebnis, das ich je hatte. Die Community ist fantastisch und die Admins sind immer hilfsbereit!'
+    text: 'Gee City ist ein Top Mid Core Server, mit tollen Spielern und noch besseren Admins. Sie kümmern sich um alles in kürzester Zeit und geben allen ein Familiäres Gefühl. Macht weiter so !!!'
   },
   {
     name: 'SarahCars',
