@@ -45,6 +45,23 @@
     --sidebar-accent-foreground: 255 255 255;
     --sidebar-border: 38 38 38;
     --sidebar-ring: 0 100% 31%;
+
+    /* Gaming theme - semantic tokens */
+    --neon-red: 0 100% 31%;
+    --neon-red-bright: 0 100% 50%;
+    --neon-red-dim: 0 100% 25%;
+    --cyber-blue: 194 100% 50%;
+    --gaming-gray: 240 4% 10%;
+    --gaming-dark: 0 0% 5%;
+    
+    /* Gradients */
+    --gradient-neon: linear-gradient(135deg, hsl(var(--neon-red)), hsl(var(--neon-red-bright)));
+    --gradient-dark: linear-gradient(135deg, hsl(var(--gaming-dark)), hsl(var(--gaming-gray)));
+    --gradient-glow: linear-gradient(90deg, transparent, hsl(var(--neon-red) / 0.3), transparent);
+    
+    /* Shadows */
+    --shadow-neon: 0 0 20px hsl(var(--neon-red) / 0.5);
+    --shadow-neon-strong: 0 0 40px hsl(var(--neon-red) / 0.8);
   }
 }
 

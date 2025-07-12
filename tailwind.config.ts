@@ -63,12 +63,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Gaming theme colors
-				'neon-red': '#ff0040',
-				'dark-red': '#8b0000',
-				'cyber-blue': '#00d4ff',
-				'gaming-gray': '#1a1a1a',
-				'gaming-dark': '#0d0d0d'
+				// Gaming theme colors using semantic tokens
+				'neon-red': 'hsl(var(--neon-red))',
+				'neon-red-bright': 'hsl(var(--neon-red-bright))',
+				'neon-red-dim': 'hsl(var(--neon-red-dim))',
+				'cyber-blue': 'hsl(var(--cyber-blue))',
+				'gaming-gray': 'hsl(var(--gaming-gray))',
+				'gaming-dark': 'hsl(var(--gaming-dark))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

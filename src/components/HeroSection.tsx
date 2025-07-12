@@ -108,7 +108,8 @@ const HeroSection = () => {
               <Button 
                 size="lg" 
                 onClick={handleJoinClick}
-                className="font-orbitron font-bold text-lg px-8 py-4 bg-neon-red hover:bg-red-600 text-white border-0 shadow-lg hover:shadow-neon-red/50 transition-all duration-300 transform hover:scale-105 animate-glow-pulse backdrop-blur-sm"
+                className="font-orbitron font-bold text-lg px-8 py-4 bg-neon-red hover:bg-neon-red-bright text-white border-0 transition-all duration-300 transform hover:scale-105 animate-glow-pulse backdrop-blur-sm"
+                style={{ boxShadow: 'var(--shadow-neon)' }}
               >
                 🚀 JETZT BEITRETEN
               </Button>

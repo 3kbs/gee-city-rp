@@ -6,6 +6,8 @@ import HighlightsSection from '../components/HighlightsSection';
 import StatsSection from '../components/StatsSection';
 import TestimonialsSection from '../components/TestimonialsSection';
 import GettingStartedSection from '../components/GettingStartedSection';
+import ServerStatus from '../components/ServerStatus';
+import CallToAction from '../components/CallToAction';
 import SocialSection from '../components/SocialSection';
 import ContactSection from '../components/ContactSection';
 import Footer from '../components/Footer';
@@ -19,8 +21,10 @@ const Index = () => {
       <FeaturesSection />
       <HighlightsSection />
       <StatsSection />
+      <ServerStatus />
       <TestimonialsSection />
       <GettingStartedSection />
+      <CallToAction />
       <SocialSection />
       <ContactSection />
       <Footer />
