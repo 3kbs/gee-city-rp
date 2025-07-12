@@ -30,15 +30,28 @@ const steps = [
     color: 'text-purple-400',
     bgColor: 'from-purple-500/20 to-purple-600/10'
   },
-  {
+    {
     icon: Play,
-    title: 'Loslegen!',
+    title: 'Einreisen!',
     description: 'Starte dein Abenteuer in GEE City',
     details: [
       'Verbinde mit dem Server',
       'Erstelle deinen Charakter',
       'Absolviere die Einreise',
       'Beginne dein Roleplay'
+    ],
+    color: 'text-green-400',
+    bgColor: 'from-green-500/20 to-green-600/10'
+  },
+  {
+    icon: Play,
+    title: 'Loslegen!',
+    description: 'Starte dein Abenteuer.',
+    details: [
+      'Hole dir dein erstes Auto',
+      'Finde einen lokrativen Nebenjob',
+      'Bewerbe dich bei einem Job',
+      'Genieße deine Zeit'
     ],
     color: 'text-green-400',
     bgColor: 'from-green-500/20 to-green-600/10'
