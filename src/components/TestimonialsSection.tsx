@@ -24,11 +24,11 @@ const testimonials = [
     text: 'Als RP-Neuling hätte ich mir keinen besseren Server wünschen können – liebevoll, hilfsbereit und voller Herzblut. Die Community ist großartig, der Einstieg wurde mir leicht gemacht, und ich fühle mich rundum willkommen. Nach zwei Monaten bin ich einfach nur begeistert'
   },
   {
-    name: 'BusinessWoman',
-    role: 'Unternehmerin',
-    avatar: '👩‍💼',
+    name: 'Paul Mirov',
+    role: 'PD, Gentlemen's Club',
+    avatar: '👮‍♂️🥃',
     rating: 5,
-    text: 'Die Wirtschafts-Features sind beeindruckend. Ich konnte mein eigenes Unternehmen aufbauen und dabei realistisch agieren.'
+    text: 'Ich war schon auf so vielen Servern und keiner hat mir bis jetzt so gut gefallen wie GeeCity. Die Leute und das Team sind einfach der Hammer und auch bei wenig Leuten kann man jeden Tag etwas Neues erleben. Ich hoffe das GeeCity noch richtig groß wird, mit euch als Team bringen wir GeeCity auf die 1!'
   }
 ];
 
