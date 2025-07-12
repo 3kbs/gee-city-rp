@@ -98,7 +98,6 @@ const SocialSection = () => {
               aber wir sind fest entschlossen, den besten Server zu schaffen, den die FiveM-Community je gesehen hat. 
               Deine Geduld und Unterstützung während dieser Zeit bedeuten uns sehr viel.
             </p>
-            </div>
           </div>
         </div>
       </div>
