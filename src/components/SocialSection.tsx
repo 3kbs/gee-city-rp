@@ -98,8 +98,6 @@ const SocialSection = () => {
               aber wir sind fest entschlossen, den besten Server zu schaffen, den die FiveM-Community je gesehen hat. 
               Deine Geduld und Unterstützung während dieser Zeit bedeuten uns sehr viel.
             </p>
-            <div className="text-2xl text-neon-red font-orbitron font-bold neon-glow animate-glow-pulse">
-              🌟 Gemeinsam werden wir GEE City zu einem Vorzeigeprojekt machen! 🌟
             </div>
           </div>
         </div>
