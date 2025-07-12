@@ -25,7 +25,7 @@ const testimonials = [
   },
   {
     name: 'Paul Mirov',
-    role: 'PD, Gentlemen's Club',
+    role: 'PD, Gentlemens Club',
     avatar: '👮‍♂️🥃',
     rating: 5,
     text: 'Ich war schon auf so vielen Servern und keiner hat mir bis jetzt so gut gefallen wie GeeCity. Die Leute und das Team sind einfach der Hammer und auch bei wenig Leuten kann man jeden Tag etwas Neues erleben. Ich hoffe das GeeCity noch richtig groß wird, mit euch als Team bringen wir GeeCity auf die 1!'
