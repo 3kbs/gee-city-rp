@@ -31,26 +31,13 @@ const steps = [
     bgColor: 'from-purple-500/20 to-purple-600/10'
   },
   {
-    icon: Settings,
-    title: 'Whitelist beantragen',
-    description: 'Fülle die Bewerbung aus',
-    details: [
-      'Gehe zu #bewerbungen',
-      'Fülle das Formular aus',
-      'Warte auf die Freischaltung',
-      'Erhalte deine Bestätigung'
-    ],
-    color: 'text-orange-400',
-    bgColor: 'from-orange-500/20 to-orange-600/10'
-  },
-  {
     icon: Play,
     title: 'Loslegen!',
     description: 'Starte dein Abenteuer in GEE City',
     details: [
       'Verbinde mit dem Server',
       'Erstelle deinen Charakter',
-      'Absolviere das Tutorial',
+      'Absolviere die Einreise',
       'Beginne dein Roleplay'
     ],
     color: 'text-green-400',
