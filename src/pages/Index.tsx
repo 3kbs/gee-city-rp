@@ -25,89 +25,102 @@ const Index = () => {
                   <h2 className="text-2xl font-semibold text-foreground">Latest Updates</h2>
                   
                   <div className="bg-background/50 rounded-lg p-6 border border-border/30">
-                    <p className="text-foreground leading-relaxed">
-                      🚨 Neues Polizei-System für Gee City – Der ultimative Roleplay-Alltag!
-Entdecke die revolutionäre Polizei-Umgebung, die deinen FiveM Server auf das nächste Level hebt! Mit hunderten von Features, realistischen Interaktionen und tiefgründigen Systemen wird der Alltag in Gee City noch intensiver und authentischer.
+                    <div className="text-foreground leading-relaxed">
+                      <h3 className="text-xl font-semibold mb-4 text-primary">🚨 Neues Polizei-System für Gee City</h3>
+                      <p className="mb-6 text-muted-foreground">
+                        Entdecke die revolutionäre Polizei-Umgebung, die deinen FiveM Server auf das nächste Level hebt! 
+                        Mit hunderten von Features, realistischen Interaktionen und tiefgründigen Systemen wird der Alltag in Gee City noch intensiver und authentischer.
+                      </p>
 
-🛠️ Ausrüstung & Gegenstände
-Die Polizei in Gee City ist bestens ausgestattet:
+                      <div className="space-y-6">
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🛠️ Ausrüstung & Gegenstände</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Alkoholtester</span> - Messt den Blutalkoholgehalt von Spielern</li>
+                            <li>• <span className="font-medium">Fingerabdruckscanner</span> - Identifiziert Verdächtige durch Fingerabdrücke</li>
+                            <li>• <span className="font-medium">Bodenmarkierungen & Sperren</span> - Platziere Konen, Barrikaden und Arbeitsscheinwerfer</li>
+                            <li>• <span className="font-medium">Stacheldrahtstreifen</span> - Zerstöre Reifen von Fahrzeugen</li>
+                            <li>• <span className="font-medium">Geschwindigkeitskamera</span> - Registriere zu schnelle Fahrzeuge</li>
+                            <li>• <span className="font-medium">Metall-/Glas-Schutzschild</span> - Bietet Schutz beim Anpeilen</li>
+                            <li>• <span className="font-medium">Nachtvision-/Thermalbrille</span> - Aktivierbar mit /toggleNVG</li>
+                          </ul>
+                        </div>
 
-Alkoholtester
-Messt den Blutalkoholgehalt von Spielern – perfekt für Kontrollen.
-Fingerabdruckscanner
-Identifiziert Verdächtige durch Fingerabdrücke.
-Bodenmarkierungen & Sperren
-Platziere Konen, Barrikaden und Arbeitsscheinwerfer – synchronisiert für alle Spieler.
-Stacheldrahtstreifen
-Zerstöre Reifen von Fahrzeugen, die über Stacheldraht fahren.
-Geschwindigkeitskamera
-Registriere Fahrzeuge, die zu schnell unterwegs sind – inkl. konfigurierbarer Strafen.
-Metall-/Glas-Schutzschild
-Bietet Schutz beim Anpeilen – ideal für Einsätze.
-Nachtvision-/Thermalbrille
-Aktivierbar mit /toggleNVG – perfekt für nächtliche Operationen.
-🚓 Patrouillenwerkzeuge
-Die tägliche Arbeit der Polizei wird durch diese Tools vereinfacht:
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🚓 Patrouillenwerkzeuge</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Radar</span> - Integriertes Fahrzeugradar mit minimalistischer UI</li>
+                            <li>• <span className="font-medium">Bodycam & Dashcam</span> - Live-Übertragung und Unfallermittlungen</li>
+                            <li>• <span className="font-medium">Tracker (Job-Blips)</span> - Echtzeit-Positionen der Beamten auf der Karte</li>
+                          </ul>
+                        </div>
 
-Radar
-Integriertes Fahrzeugradar mit minimalistischer UI – inkl. Autolock-Geschwindigkeitsgrenzen.
-Bodycam & Dashcam
-Bodycam : Aktivierbar jederzeit – Live-Übertragung im Polizeirevier.
-Dashcam : Installierbar in Fahrzeugen – perfekt für Unfallermittlungen.
-Tracker (Job-Blips)
-Echtzeit-Positionen der Beamten auf der Karte – mit unterschiedlichen Blip-Typen (Auto, Hubschrauber, etc.).
-🧾 MDT (Mobile Data Terminal)
-Das Herzstück der Polizei in Gee City:
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🧾 MDT (Mobile Data Terminal)</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Berechtigungssystem</span> - Vollständig konfigurierbar für jede Seite</li>
+                            <li>• <span className="font-medium">Tags & Farbcodierte Strafen</span> - Erstelle Tags mit individuellen Farben</li>
+                            <li>• <span className="font-medium">Unbegrenzte MDTs</span> - Separate MDTs für Polizei, EMS, DOJ, Mechaniker</li>
+                            <li>• <span className="font-medium">Custom Pages</span> - Integriere externe Webseiten oder benutzerdefinierte UIs</li>
+                          </ul>
+                        </div>
 
-🔐 Berechtigungssystem
-Vollständig konfigurierbar: Lesen, Schreiben, Löschen – individuell für jede Seite.
-Voreingestellte Berechtigungen oder komplett deaktivierbar.
-🏷️ Tags & Farbcodierte Strafen
-Erstelle Tags für Profile, Fahrzeuge, Berichte – mit individuellen Farben.
-Verbessere Übersichtlichkeit durch farbcodierte Strafen.
-🌐 Unbegrenzte MDTs
-Erstelle separate MDTs für Polizei, EMS, DOJ, Mechaniker – mit einstellbaren Seiten und Jobs.
-Custom Pages : Integriere externe Webseiten (iframe) oder benutzerdefinierte UIs.
-🚨 Dispatch-System
-Die Einsätze in Gee City werden koordiniert:
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🚨 Dispatch-System</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Call Manager</span> - Navigiere durch aktive Notrufe</li>
+                            <li>• <span className="font-medium">Kartenansicht</span> - Zeige alle Notrufe & Einheiten an</li>
+                            <li>• <span className="font-medium">Vordefinierte Warnungen</span> - Schießerei, Geschwindigkeitsverstoß, Fahrzeugdiebstahl</li>
+                          </ul>
+                        </div>
 
-Call Manager
-Navigiere durch aktive Notrufe – setze Wegpunkte bei Einsätzen.
-Kartenansicht
-Zeige alle Notrufe & Einheiten an – zeichne Linien, Kreise oder Polygone.
-Vordefinierte Warnungen
-Schießerei, Geschwindigkeitsverstoß, Fahrzeugdiebstahl – konfigurierbar nach Bedarf.
-🚫 Gefängnis-System
-Ein tiefgründiges Gefängnis-System mit vielen Möglichkeiten:
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🚫 Gefängnis-System</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Fußfesseln & Tracker</span> - Setze Fußfesseln auf Spieler</li>
+                            <li>• <span className="font-medium">Gefängnis-Aktivitäten</span> - Müllabfuhr, Gartenarbeit, Essensausgabe</li>
+                            <li>• <span className="font-medium">16 interagierbare NPCs</span> - Wärter, Ärzte, Häftlinge</li>
+                            <li>• <span className="font-medium">3 Fluchtmöglichkeiten</span> - Explosivstoffe, Hacking oder Graben</li>
+                          </ul>
+                        </div>
 
-👟 Fußfesseln & Fußfesseln-Tracker
-Setze Fußfesseln auf Spieler – alle Polizisten sehen die Echtzeitposition.
-Entferne sie mit dem Prison-MDT oder einer Kettensäge.
-🧱 Gefängnis-Aktivitäten
-Aufgaben : Müllabfuhr, Gartenarbeit, Essensausgabe – reduziere Strafe durch Erfolg.
-Roulette & Drogenherstellung : Interagiere mit NPCs und verdiene Gegenstände.
-NPCs : 16 interagierbare Charaktere (Wärter, Ärzte, Häftlinge).
-🔥 Gefängnisflucht
-Explosivstoffe, Hacking oder Graben : 3 Wege, um das Gefängnis zu verlassen!
-🔍 Beweissystem
-Ermittle wie ein Profi:
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🔍 Beweissystem</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Beweistypen</span> - Kugelschalen, Blutproben, Fingerabdrücke</li>
+                            <li>• <span className="font-medium">Szene-Rekonstruktion</span> - Fotografiere die Tatortszene</li>
+                            <li>• <span className="font-medium">GSR-Test</span> - Analysiere Schusswaffenrückstände</li>
+                          </ul>
+                        </div>
 
-Beweistypen : Kugelschalen, Blutproben, Fingerabdrücke – sammel mit Taschenlampe.
-Szene-Rekonstruktion : Fotografiere die Tatortszene – alle Beweise mit Bezeichnungen.
-GSR-Test : Analysiere Schusswaffenrückstände – entferne sie durch Händewaschen.
-🏢 Weitere Highlights
-Evidenz-Schließfächer : Speichere/nimm Beweise mit benutzerdefinierten Namen.
-Zusammenarbeit zwischen Abteilungen : Gemeinsame Berichte & Tags.
-Mitarbeiter-Einstellung : Stelle neue Kolleg:innen direkt im MDT an.
-🧩 Zusammenfassung
-Mit dem neuen Polizei-System in Gee City wird dein Roleplay-Alltag realistischer, dynamischer und unvergesslich !
+                        <div>
+                          <h4 className="text-lg font-medium mb-3 text-primary">🏢 Weitere Highlights</h4>
+                          <ul className="space-y-2 text-sm">
+                            <li>• <span className="font-medium">Evidenz-Schließfächer</span> - Speichere/nimm Beweise mit benutzerdefinierten Namen</li>
+                            <li>• <span className="font-medium">Zusammenarbeit zwischen Abteilungen</span> - Gemeinsame Berichte & Tags</li>
+                            <li>• <span className="font-medium">Mitarbeiter-Einstellung</span> - Stelle neue Kolleg:innen direkt im MDT an</li>
+                          </ul>
+                        </div>
 
-✅ Kompatibel mit FiveM Asset Escrow System
-✅ Integration mit beliebten Mods (tk_cctv, tk_jail, tk_dispatch)
-✅ Unendliche Möglichkeiten für kreative Ermittlungen & Einsätze
-Willkommen in Gee City – Wo jeder Tag ein neuer Einsatz wird! 🚨
-Melde dich an und tauche ein in die Welt der Polizei, Justiz und Action!
-                    </p>
+                        <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
+                          <h4 className="text-lg font-medium mb-2 text-primary">✅ Kompatibilität & Integration</h4>
+                          <ul className="space-y-1 text-sm">
+                            <li>• Kompatibel mit FiveM Asset Escrow System</li>
+                            <li>• Integration mit beliebten Mods (tk_cctv, tk_jail, tk_dispatch)</li>
+                            <li>• Unendliche Möglichkeiten für kreative Ermittlungen & Einsätze</li>
+                          </ul>
+                        </div>
+
+                        <div className="text-center mt-6">
+                          <p className="text-primary font-medium">
+                            🚨 Willkommen in Gee City – Wo jeder Tag ein neuer Einsatz wird! 🚨
+                          </p>
+                          <p className="text-muted-foreground mt-2">
+                            Melde dich an und tauche ein in die Welt der Polizei, Justiz und Action!
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="text-sm text-muted-foreground text-center pt-4">
