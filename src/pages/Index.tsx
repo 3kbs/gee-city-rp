@@ -135,13 +135,13 @@ const Index = () => {
                     {/* Top row - 2 videos */}
                     <div className="grid gap-6 md:grid-cols-2">
                       <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                        <h3 className="text-lg font-medium mb-3 text-primary">Server Trailer</h3>
+                        <h3 className="text-lg font-medium mb-3 text-primary">Police Job</h3>
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
                             width="100%"
                             height="100%"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Server Trailer"
+                            src="https://www.youtube.com/embed/XGKWqiQQc9o"
+                            title="Police Job"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
@@ -151,13 +151,13 @@ const Index = () => {
                       </div>
                       
                       <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                        <h3 className="text-lg font-medium mb-3 text-primary">Polizei System Demo</h3>
+                        <h3 className="text-lg font-medium mb-3 text-primary">Police MDT</h3>
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
                             width="100%"
                             height="100%"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Polizei System Demo"
+                            src="https://www.youtube.com/embed/YkmwQpMkg-Y"
+                            title="Police MDT"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
@@ -170,13 +170,13 @@ const Index = () => {
                     {/* Bottom row - 3 videos */}
                     <div className="grid gap-6 md:grid-cols-3">
                       <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                        <h3 className="text-lg font-medium mb-3 text-primary">Gameplay Highlights</h3>
+                        <h3 className="text-lg font-medium mb-3 text-primary">Dispatch System</h3>
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
                             width="100%"
                             height="100%"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Gameplay Highlights"
+                            src="https://www.youtube.com/embed/fih_QxIaDyE"
+                            title="Dispatch System"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
@@ -186,13 +186,13 @@ const Index = () => {
                       </div>
                       
                       <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                        <h3 className="text-lg font-medium mb-3 text-primary">Event Recap</h3>
+                        <h3 className="text-lg font-medium mb-3 text-primary">Jail System</h3>
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
                             width="100%"
                             height="100%"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Event Recap"
+                            src="https://www.youtube.com/embed/VuYm_8GZQGU"
+                            title="Jail System"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
@@ -202,13 +202,13 @@ const Index = () => {
                       </div>
                       
                       <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                        <h3 className="text-lg font-medium mb-3 text-primary">Tutorial Guide</h3>
+                        <h3 className="text-lg font-medium mb-3 text-primary">Evidence System</h3>
                         <div className="aspect-video rounded-lg overflow-hidden">
                           <iframe
                             width="100%"
                             height="100%"
-                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            title="Tutorial Guide"
+                            src="https://www.youtube.com/embed/ciIj5C27T2Y"
+                            title="Evidence System"
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
