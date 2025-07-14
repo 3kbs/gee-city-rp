@@ -7,44 +7,44 @@
 
 @layer base {
   :root {
-    --background: 13 13 13; /* Very dark background */
-    --foreground: 255 255 255; /* White text */
+    --background: 0 0% 5%; /* Very dark background */
+    --foreground: 0 0% 100%; /* White text */
 
-    --card: 26 26 26; /* Dark gray cards */
-    --card-foreground: 255 255 255;
+    --card: 0 0% 10%; /* Dark gray cards */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 26 26 26;
-    --popover-foreground: 255 255 255;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 0 100% 31%; /* Neon red */
-    --primary-foreground: 255 255 255;
+    --primary: 0 100% 50%; /* Neon red */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 139 0 0; /* Dark red */
-    --secondary-foreground: 255 255 255;
+    --secondary: 0 50% 25%; /* Dark red */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 38 38 38;
-    --muted-foreground: 163 163 163;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 0 84% 50%; /* Bright accent red */
-    --accent-foreground: 255 255 255;
+    --accent: 0 84% 60%; /* Bright accent red */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 38 38 38;
-    --input: 38 38 38;
-    --ring: 0 100% 31%; /* Neon red ring */
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 100% 50%; /* Neon red ring */
 
     --radius: 0.5rem;
 
-    --sidebar-background: 13 13 13;
-    --sidebar-foreground: 255 255 255;
-    --sidebar-primary: 0 100% 31%;
-    --sidebar-primary-foreground: 255 255 255;
-    --sidebar-accent: 26 26 26;
-    --sidebar-accent-foreground: 255 255 255;
-    --sidebar-border: 38 38 38;
-    --sidebar-ring: 0 100% 31%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 100% 50%;
 
     /* Gaming theme - semantic tokens */
     --neon-red: 0 100% 31%;
