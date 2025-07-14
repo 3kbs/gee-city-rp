@@ -131,36 +131,90 @@ const Index = () => {
                 <div className="mt-12 space-y-6">
                   <h2 className="text-2xl font-semibold text-foreground">📺 Videos</h2>
                   
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                      <h3 className="text-lg font-medium mb-3 text-primary">Server Trailer</h3>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                          title="Server Trailer"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-full"
-                        ></iframe>
+                  <div className="space-y-6">
+                    {/* Top row - 2 videos */}
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <div className="bg-background/50 rounded-lg p-4 border border-border/30">
+                        <h3 className="text-lg font-medium mb-3 text-primary">Server Trailer</h3>
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Server Trailer"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          ></iframe>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-background/50 rounded-lg p-4 border border-border/30">
+                        <h3 className="text-lg font-medium mb-3 text-primary">Polizei System Demo</h3>
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Polizei System Demo"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          ></iframe>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="bg-background/50 rounded-lg p-4 border border-border/30">
-                      <h3 className="text-lg font-medium mb-3 text-primary">Polizei System Demo</h3>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <iframe
-                          width="100%"
-                          height="100%"
-                          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                          title="Polizei System Demo"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-full"
-                        ></iframe>
+                    {/* Bottom row - 3 videos */}
+                    <div className="grid gap-6 md:grid-cols-3">
+                      <div className="bg-background/50 rounded-lg p-4 border border-border/30">
+                        <h3 className="text-lg font-medium mb-3 text-primary">Gameplay Highlights</h3>
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Gameplay Highlights"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          ></iframe>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-background/50 rounded-lg p-4 border border-border/30">
+                        <h3 className="text-lg font-medium mb-3 text-primary">Event Recap</h3>
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Event Recap"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          ></iframe>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-background/50 rounded-lg p-4 border border-border/30">
+                        <h3 className="text-lg font-medium mb-3 text-primary">Tutorial Guide</h3>
+                        <div className="aspect-video rounded-lg overflow-hidden">
+                          <iframe
+                            width="100%"
+                            height="100%"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Tutorial Guide"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full"
+                          ></iframe>
+                        </div>
                       </div>
                     </div>
                   </div>
